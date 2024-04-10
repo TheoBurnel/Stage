@@ -26,7 +26,10 @@ function getChildrenByParent(parent) {
                 titre: feature.properties.Titre,
                 name: feature.properties.Identifiant,
                 type: feature.properties.Type,
+                representation: feature.properties.Representation,
+                attribution: feature.properties.Attribution,
                 lieu: feature.properties.Lieu_de_creation,
+                realisation: feature.properties.Realisation,
                 caracteristique: feature.properties.Caracteristique,
                 technique: feature.properties.Technique,
                 couleur: feature.properties.Couleur,
@@ -36,6 +39,7 @@ function getChildrenByParent(parent) {
                 mesure: feature.properties.Mesure,
                 date: feature.properties.Date,
                 rapport: feature.properties.Rapport,
+                source: feature.properties.Source,
                 localisation: feature.properties.Localisation,
                 cote: feature.properties.Cote,
                 // Ajoutez d'autres propriétés d'enfants si nécessaires
@@ -88,7 +92,7 @@ function createCarousel(parent, identifiant) {
         }
     
         // Lien vers la slidebar
-        carouselContent += "<p class='slidebar-link' onclick='showSlidebar(\"" + child.titre + "\", \"" + parent + "\", \"" + child.name + "\", \"" + child.type + "\", \"" + child.lieu + "\", \"" + child.caracteristique + "\", \"" + child.technique + "\", \"" + child.couleur + "\", \"" + child.materiaux + "\", \"" + child.certitude + "\", \"" + child.technique + "\", \"" + child.mesure + "\", \"" + child.date + "\", \"" + child.rapport + "\", \"" + child.localisation + "\", \"" + child.cote + "\")'>En savoir plus</p>";
+        carouselContent += "<p class='slidebar-link' onclick='showSlidebar(\"" + child.titre + "\", \"" + parent + "\", \"" + child.name + "\", \"" + child.type + "\", \"" + child.representation + "\", \"" + child.attribution + "\", \"" + child.lieu + "\", \"" + child.realisation + "\", \"" + child.caracteristique + "\", \"" + child.technique + "\", \"" + child.couleur + "\", \"" + child.materiaux + "\", \"" + child.certitude + "\", \"" + child.technique + "\", \"" + child.mesure + "\", \"" + child.date + "\", \"" + child.rapport + "\", \"" + child.source + "\", \"" + child.localisation + "\", \"" + child.cote + "\")'>En savoir plus</p>";
 
         carouselContent += "</div>";
     });
@@ -129,10 +133,11 @@ geojson_RAMA.features.forEach(function(feature) {
 });
 
 
+
 // Ajout du groupe de clusters à la carte
 map.addLayer(markers);
 
-function showSlidebar(titre, parent, name, type, lieu, caracteristique, technique, couleur, materiaux, certitude, technique, mesure, date, rapport, localisation, cote) {
+function showSlidebar(titre, parent, name, type, representation, attribution, lieu, realisation, caracteristique, technique, couleur, materiaux, certitude, technique, mesure, date, rapport, source, localisation, cote) {
     var slidebar = document.createElement('div');
     slidebar.className = 'slidebar';
 
@@ -148,8 +153,11 @@ function showSlidebar(titre, parent, name, type, lieu, caracteristique, techniqu
             <div class="slidebar-body">
                 <p><u>Identification</u></p>
                 <p>Type d'œuvre: ${type || '?'}</p>
+                <p>Représentation: ${representation || '?'}</p>
                 <p><u>Création</u></p>
+                <p>Attribué à: ${attribution || '?'}</p>
                 <p>Lieu de création: ${lieu || '?'}</p>
+                <p>Date: ${realisation || '?'}</p>
                 <p><u>Description</u></p>
                 <p>Caractéristique: ${caracteristique || '?'}</p>
                 <p>Technique(s): ${technique || '?'}</p>
@@ -163,6 +171,7 @@ function showSlidebar(titre, parent, name, type, lieu, caracteristique, techniqu
                     <li>Date: ${date || '?'}</li>
                 </ul></p>
                 <p>Rapport de l'analyse: ${rapport || '?'}</p>
+                <p>Source du rapport: ${source || '?'} </p>
                 <p><u>Lieu de conservation</u></p>
                 <p>Localisation: ${localisation || '?'}</p>
                 <p>Cote / numéro: ${cote || '?'}</p>

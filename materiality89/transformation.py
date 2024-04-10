@@ -49,7 +49,10 @@ def csv_to_json(input_csv_path, output_json_path):
             titre = escapeApostrophes(parse_value(row["dcterms:title"]))
             parent = escapeApostrophes(parse_value(row["crm:P106_forms_part_of"]))
             type = escapeApostrophes(parse_value(row["schema:artform"]))
+            representation = escapeApostrophes(parse_value(row['dcterms:subject']))
+            attribution = escapeApostrophes(parse_value(row['schema:creator']))
             ville = escapeApostrophes(parse_value(row["schema:locationCreated"]))
+            realisation = escapeApostrophes(parse_value(row["crm:P4_has_time-span"]))
             identifiant = escapeApostrophes(parse_value(row["schema:identifier"]))
             caracteristique = escapeApostrophes(parse_value(row["dcterms:type"]))
             technique = escapeApostrophes(parse_value(row["schema:artMedium"]))
@@ -60,6 +63,7 @@ def csv_to_json(input_csv_path, output_json_path):
             mesure = escapeApostrophes(parse_value(row["schema:hasMeasurement"]))
             date = escapeApostrophes(parse_value(row["schema:observationDate"]))
             rapport = escapeApostrophes(parse_value(row['dcterms:abstract']))
+            source = escapeApostrophes(parse_value(row['dcterms:isReferencedBy']))
             localisation = escapeApostrophes(parse_value(row['crm:P54_has_current_permanent_location']))
             cote = escapeApostrophes(parse_value(row['crm:P1_is_identified_by']))
 
@@ -73,7 +77,10 @@ def csv_to_json(input_csv_path, output_json_path):
                     "Titre": titre,
                     "Parent": parent,
                     "Type": type,
+                    "Representation": representation,
+                    "Attribution": attribution,
                     "Lieu_de_creation": ville,
+                    "Realisation": realisation,
                     "Identifiant": identifiant,
                     "Caracteristique": caracteristique,
                     "Technique": technique,
@@ -84,6 +91,7 @@ def csv_to_json(input_csv_path, output_json_path):
                     "Mesure": mesure,
                     "Date": date,
                     "Rapport": rapport,
+                    "Source": source,
                     "Localisation": localisation,
                     "Cote": cote,
                 },
