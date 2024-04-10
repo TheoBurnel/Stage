@@ -1,3 +1,4 @@
+
 // Initialiser la carte Leaflet
 var map = L.map('map').setView([39.56939, 2.65024], 12);
 
@@ -24,8 +25,8 @@ function getChildrenByParent(parent) {
                 name: feature.properties.Identifiant,
                 caracteristique: feature.properties.Caracteristique,
                 technique: feature.properties.Technique,
-                materiaux: feature.properties.Materiaux
-                // couleur: feature.properties.Couleur,
+                couleur: feature.properties.Couleur,
+                materiaux: feature.properties.Materiaux,
                 // Ajoutez d'autres propriétés d'enfants si nécessaires
             });
         }
@@ -76,7 +77,7 @@ function createCarousel(parent, identifiant) {
         }
     
         // Lien vers la slidebar
-        carouselContent += "<p class='slidebar-link' onclick='showSlidebar(\"" + identifiant + "\")'>En savoir plus</p>"; // Ajouter une classe au lien
+        carouselContent += "<p class='slidebar-link' onclick='showSlidebar(\"" + parent + "\", \"" + child.name + "\", \"" + child.caracteristique + "\", \"" + child.technique + "\", \"" + child.couleur + "\", \"" + child.materiaux + "\")'>En savoir plus</p>";
 
         carouselContent += "</div>";
     });
@@ -102,7 +103,16 @@ geojson_RAMA.features.forEach(function(feature) {
         var parent = feature.properties.Parent;
         var popupContent = createCarousel(parent, identifiant); // Passer l'identifiant à createCarousel()
 
-        marker.bindPopup(popupContent); // Liaison du popup au marqueur
+        // Liaison du popup au marqueur
+        marker.bindPopup(popupContent, {
+            maxWidth: 400 // Définir une largeur maximale pour l'info-bulle
+        });
+
+        // Écouter l'événement de fermeture de l'info-bulle
+        marker.on('popupclose', function() {
+            hideSlidebar(); // Fermer la slidebar lorsque l'info-bulle est fermée
+        });
+
         markers.addLayer(marker); // Ajout du marqueur au groupe de clusters
     }
 });
@@ -111,58 +121,57 @@ geojson_RAMA.features.forEach(function(feature) {
 // Ajout du groupe de clusters à la carte
 map.addLayer(markers);
 
-function showSlidebar() {
-    // Créer un élément de slidebar
+function showSlidebar(parent, name, caracteristique, technique, couleur, materiaux) {
     var slidebar = document.createElement('div');
     slidebar.className = 'slidebar';
-    
-    // Contenu de la slidebar avec l'icône de fermeture et le contenu personnalisé
+
     slidebar.innerHTML = `
         <div class="slidebar-content">
-        <button class="close-btn" onclick="hideSlidebar()">&raquo;</button>
+            <button class="close-btn" onclick="hideSlidebar()">&raquo;</button>
             <div class="slidebar-header">
-                <h2>Valeur parent comme titre</h2>
+                <h2>${parent}</h2> <!-- Utilisation du nom du parent comme titre -->
             </div>
             <div>
-                <h3>Valeur enfant comme sous-titre</h2>
+                <h3>${name}</h3> <!-- Utilisation du nom de l'enfant comme sous-titre -->
             </div>
             <div class="slidebar-body">
-                <p>Contenu de la slidebar ici...</p>
-                <p>Vous pouvez personnaliser le contenu selon vos besoins.</p>
+                <p>Caractéristique: ${caracteristique}</p>
+                <p>Technique(s): ${technique}</p>
+                <p>Couleur(s): ${couleur}</p>
+                <p>Matériau(x): ${materiaux}</p>
+                <!-- Ajoutez d'autres informations d'enfant si nécessaires -->
             </div>
         </div>
     `;
-    
-    // Ajouter la slidebar à l'élément body (ou à un autre conteneur approprié)
+
     document.body.appendChild(slidebar);
 
     // Appliquer des styles CSS pour positionner et styliser la slidebar
-    slidebar.style.position = 'fixed';        // Utiliser un positionnement fixe par rapport à la fenêtre
-    slidebar.style.top = '0';                  // Positionner la slidebar en haut de la fenêtre
-    slidebar.style.right = '0';                // Positionner la slidebar tout à droite
-    slidebar.style.width = '300px';            // Définir la largeur de la slidebar
-    slidebar.style.height = '100vh';           // Définir la hauteur de la slidebar
-    slidebar.style.backgroundColor = '#ffffff'; // Couleur de fond de la slidebar (blanc)
-    slidebar.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)'; // Ombre légère pour la slidebar
-    slidebar.style.zIndex = '1000';            // Assurer que la slidebar est au-dessus de la carte
-    slidebar.style.overflowY = 'auto';         // Ajouter une barre de défilement si nécessaire
+    slidebar.style.position = 'fixed';
+    slidebar.style.top = '0';
+    slidebar.style.right = '0';
+    slidebar.style.width = '300px';
+    slidebar.style.height = '100vh';
+    slidebar.style.backgroundColor = '#ffffff';
+    slidebar.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+    slidebar.style.zIndex = '1000';
+    slidebar.style.overflowY = 'auto';
 
-    // Déplacer la slidebar vers la position visible avec une animation
     setTimeout(function() {
         slidebar.style.transform = 'translateX(0)';
-    }, 100); // Délai pour démarrer l'animation
+    }, 100);
 }
 
-// Fonction pour masquer la slidebar
+// Fonction pour masquer et supprimer la slidebar
 function hideSlidebar() {
     var slidebar = document.querySelector('.slidebar');
-    slidebar.style.transform = 'translateX(100%)'; // Cacher la slidebar en la déplaçant hors de l'écran
-    setTimeout(function() {
-        slidebar.remove(); // Supprimer la slidebar du DOM après la transition
-    }, 300); // Délai pour la transition de fermeture (300ms correspond à la durée de l'animation)
+    if (slidebar) {
+        slidebar.style.transform = 'translateX(100%)'; // Masquer la slidebar
+        setTimeout(function() {
+            slidebar.remove(); // Supprimer la slidebar du DOM après la transition
+        }, 300); // Délai pour la transition de fermeture (300ms correspond à la durée de l'animation)
+    }
 }
-
-
 
 // Fonction pour passer à la diapositive précédente dans le carrousel
 function prevSlide(button) {
@@ -173,6 +182,9 @@ function prevSlide(button) {
 
     slides[currentSlide].style.display = 'none';
     slides[prevSlide].style.display = 'block';
+
+    // Fermer la slidebar lorsque l'on change de diapositive
+    hideSlidebar();
 }
 
 // Fonction pour passer à la diapositive suivante dans le carrousel
@@ -185,8 +197,6 @@ function nextSlide(button) {
     slides[currentSlide].style.display = 'none';
     slides[nextSlide].style.display = 'block';
 
-    // Réinitialiser le carrousel au premier slide si nous atteignons le dernier slide
-    if (nextSlide === 0) {
-        slides[0].style.display = 'block';
-    }
+    // Fermer la slidebar lorsque l'on change de diapositive
+    hideSlidebar();
 }
