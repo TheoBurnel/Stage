@@ -182,17 +182,6 @@ function showSlidebar(titre, parent, name, type, representation, attribution, li
 
     document.body.appendChild(slidebar);
 
-    // Appliquer des styles CSS pour positionner et styliser la slidebar
-    slidebar.style.position = 'fixed';
-    slidebar.style.top = '0';
-    slidebar.style.right = '0';
-    slidebar.style.width = '300px';
-    slidebar.style.height = '100vh';
-    slidebar.style.backgroundColor = '#ffffff';
-    slidebar.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
-    slidebar.style.zIndex = '1000';
-    slidebar.style.overflowY = 'auto';
-
     setTimeout(function() {
         slidebar.style.transform = 'translateX(0)';
     }, 100);

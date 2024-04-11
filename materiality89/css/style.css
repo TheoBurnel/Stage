@@ -24,23 +24,6 @@ html, body {
   padding: 10px;
 }
 
-.container_slider {
-  bottom: 10px;
-  left: 20px;
-  width: 20%;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-}
-
-#resume {
-  right: 40%;
-  top: 2%;
-  background: #fff;
-  border: 1px solid #999;
-  border-radius: 7px;
-  font-size: 12px;
-}
-
 /* Styles pour les infobulles */
 p b a:hover {
   text-shadow: 2px 1px 5px rgb(218, 218, 218);
@@ -80,7 +63,7 @@ button:hover {
   position: fixed;
   top: 0;
   right: 0;
-  width: 500px;
+  width: 400px;
   height: 100vh;
   background-color: #f8f9fa;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
