@@ -1,3 +1,4 @@
+
 import csv
 import json
 import os
@@ -27,6 +28,24 @@ def parse_value(value_string):
     else:
         return value_string  # Retourner la valeur telle quelle si pas de §
 
+def pour_filtre(filtre):
+    if not filtre.strip() or filtre == "Null":
+        return "?"
+
+    if '§' in filtre:
+        # Extraire seulement l'année de début (avant le délimiteur '§')
+        value = filtre.split('§')[0]
+    else:
+        value = filtre  # Utiliser la valeur telle quelle si pas de délimiteur '§'
+        
+    # Si la valeur contient une date au format 'YYYY-MM-DD AD', extraire seulement l'année
+    if ' ' in value:
+        year = value.split()[0]  # Récupérer l'année avant le premier espace
+    else:
+        year = value  # Si pas de date précise, utiliser la valeur telle quelle
+        
+    return year.strip()
+
 def escapeApostrophes(text):
     return text.replace("'", '&#39;')
 
@@ -53,6 +72,7 @@ def csv_to_json(input_csv_path, output_json_path):
             attribution = escapeApostrophes(parse_value(row['schema:creator']))
             ville = escapeApostrophes(parse_value(row["schema:locationCreated"]))
             realisation = escapeApostrophes(parse_value(row["crm:P4_has_time-span"]))
+            date_filtre = escapeApostrophes(pour_filtre(row["crm:P4_has_time-span"]))
             identifiant = escapeApostrophes(parse_value(row["schema:identifier"]))
             caracteristique = escapeApostrophes(parse_value(row["dcterms:type"]))
             technique = escapeApostrophes(parse_value(row["schema:artMedium"]))
@@ -94,6 +114,7 @@ def csv_to_json(input_csv_path, output_json_path):
                     "Source": source,
                     "Localisation": localisation,
                     "Cote": cote,
+                    "Date_filtre": date_filtre
                 },
                 "type": "Feature"
             }
@@ -112,10 +133,11 @@ def csv_to_json(input_csv_path, output_json_path):
         json.dump({"type": "FeatureCollection", "features": data}, json_file, indent=4, ensure_ascii=False)
 
 # Spécifiez le chemin du fichier CSV en entrée et du fichier JSON en sortie
-csv_input_path = '../../bases/materiality89.csv'
-json_output_path = 'data/materiality89.js'
+csv_input_path = '../bases/materiality89.csv'
+json_output_path = 'materiality89/data/materiality89.js'
 
 # Appeler la fonction pour convertir le fichier CSV en JSON
 csv_to_json(csv_input_path, json_output_path)
 
 print("Conversion CSV vers JSON réussie !")
+

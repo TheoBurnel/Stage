@@ -129,3 +129,18 @@ a {
 a:hover {
   color: #0056b3;
 }
+
+/* Positionner le contrôle de filtre en bas */
+.year-filter-control {
+  position: relative;
+  left: 40%; /* Centrer horizontalement */
+  transform: translateX(-50%); /* Déplacer de -50% de la largeur du contrôle pour le centrer */
+  z-index: 1000; /* Assurer que le contrôle est au-dessus des autres éléments */
+  text-align: center; /* Centrer le contenu */
+  font-size: 20px; /* Taille de police plus grande */
+  padding: 10px; /* Espace intérieur */
+  border-radius: 8px; /* Coins arrondis */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombre légère */
+}
+
+
