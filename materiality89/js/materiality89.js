@@ -18,7 +18,7 @@ function isParent(identifiant) {
 function getChildrenByParent(parent) {
     var children = [];
 
-    geojson_RAMA.features.forEach(function(feature) {
+    geojson_RAMA.features.forEach(function (feature) {
         if (feature.properties.Parent === parent) {
             children.push({
                 titre: feature.properties.Titre || '?',
@@ -47,12 +47,28 @@ function getChildrenByParent(parent) {
     return children;
 }
 
+// Fonction pour afficher le titre parent lorsque le curseur survole un marqueur
+function showParentTitle(e) {
+    var parentTitleElement = document.getElementById('parentTitle');
+    if (parentTitleElement) {
+        parentTitleElement.textContent = e.target.feature.properties.Parent;
+    }
+}
+
+// Fonction pour effacer le titre parent lorsque le curseur quitte un marqueur
+function hideParentTitle() {
+    var parentTitleElement = document.getElementById('parentTitle');
+    if (parentTitleElement) {
+        parentTitleElement.textContent = '';
+    }
+}
+
 // Fonction pour créer le contenu du carrousel pour les enfants
 function createCarousel(parent, identifiant) {
     var carouselContent = "<div class='carousel'><div class='carousel-content'>";
 
     var children = getChildrenByParent(parent);
-    children.forEach(function(child, index) {
+    children.forEach(function (child, index) {
         var displayStyle = index === 0 ? 'block' : 'none';
 
         carouselContent += "<div class='slide' style='display: " + displayStyle + ";'>";
@@ -106,7 +122,7 @@ function showSlidebar(child) {
         </div>`;
 
     document.body.appendChild(slidebar);
-    setTimeout(function() {
+    setTimeout(function () {
         slidebar.style.transform = 'translateX(0)';
     }, 100);
 }
@@ -116,7 +132,7 @@ function hideSlidebar() {
     var slidebar = document.querySelector('.slidebar');
     if (slidebar) {
         slidebar.style.transform = 'translateX(100%)';
-        setTimeout(function() {
+        setTimeout(function () {
             slidebar.remove();
         }, 300);
     }
@@ -148,67 +164,7 @@ function nextSlide(button) {
     hideSlidebar();
 }
 
-// Définition des types d'œuvres avec leurs clés et libellés
-var typesOfWork = {
-    manuscrit: 'manuscrit',
-    enluminure: 'enluminure',
-    bréviaire: 'bréviaire',
-    dessin: 'dessin',
-    peinture: 'peinture',
-    estampe: 'estampe'
-};
 
-// Ajout d'un contrôle de sélection pour filtrer par type d'œuvre
-var controlSelect = L.control({ position: 'topright' });
-
-controlSelect.onAdd = function(map) {
-    var div = L.DomUtil.create('div', 'type-filter-control');
-    div.innerHTML = '<h4>Filtrer par type d\'œuvre</h4>';
-
-    var selectHTML = '<select onchange="updateTypeFilter(this.value)">';
-    selectHTML += '<option value="">Tous les types</option>';
-    for (var key in typesOfWork) {
-        selectHTML += '<option value="' + key + '">' + typesOfWork[key] + '</option>';
-    }
-    selectHTML += '</select>';
-
-    div.innerHTML += selectHTML;
-
-    return div;
-};
-
-controlSelect.addTo(map);
-
-// Fonction pour filtrer les marqueurs par date de réalisation et type d'œuvre
-function filterMarkersByDateAndType(yearFilter, typeFilter) {
-    markers.clearLayers();
-
-    geojson_RAMA.features.forEach(function(feature) {
-        var identifiant = feature.properties.Identifiant;
-        var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
-        var type = feature.properties.Type;
-
-        // Vérifie si le type de l'œuvre contient le type filtré
-        if (isParent(identifiant) && dateYear <= yearFilter && (typeFilter === '' || type.includes(typeFilter))) {
-            var coordinates = feature.geometry.coordinates;
-            var marker = L.marker([coordinates[1], coordinates[0]]);
-            var parent = feature.properties.Parent;
-            var popupContent = createCarousel(parent, identifiant);
-
-            marker.bindPopup(popupContent, {
-                maxWidth: 400
-            });
-
-            marker.on('popupclose', function() {
-                hideSlidebar();
-            });
-
-            markers.addLayer(marker);
-        }
-    });
-
-    map.addLayer(markers);
-}
 
 // Variables pour les filtres par date
 var yearFilterMin = 400;
@@ -231,15 +187,146 @@ function updateTypeFilter(value) {
     filterMarkersByDateAndType(currentYearFilter, currentTypeFilter);
 }
 
-// Ajout d'un contrôle de sélection pour filtrer par année de réalisation
+// Ajout du contrôle de sélection avec jauge pour filtrer par année de réalisation
 var controlSlider = L.control({ position: 'topright' });
 
-controlSlider.onAdd = function(map) {
+controlSlider.onAdd = function (map) {
     var div = L.DomUtil.create('div', 'year-filter-control');
     div.innerHTML = '<h4>Filtrer par année de réalisation</h4>';
-    div.innerHTML += '<input type="range" min="' + yearFilterMin + '" max="' + yearFilterMax + '" value="' + currentYearFilter + '" step="1" onchange="updateYearFilter(this.value)">';
-    div.innerHTML += '<span id="selectedYear">' + currentYearFilter + '</span>';
+
+    // Bouton pour diminuer l'année
+    var decreaseButton = L.DomUtil.create('button', 'year-decrease-btn');
+    decreaseButton.innerHTML = '-';
+    decreaseButton.onclick = function () {
+        decrementYear();
+    };
+
+    // Bouton pour augmenter l'année
+    var increaseButton = L.DomUtil.create('button', 'year-increase-btn');
+    increaseButton.innerHTML = '+';
+    increaseButton.onclick = function () {
+        incrementYear();
+    };
+
+    // Jauge d'année
+    var yearRangeInput = L.DomUtil.create('input', 'year-range-input');
+    yearRangeInput.type = 'range';
+    yearRangeInput.min = yearFilterMin;
+    yearRangeInput.max = yearFilterMax;
+    yearRangeInput.value = currentYearFilter;
+    yearRangeInput.step = 10; // Utilisation d'un pas de 10 pour l'année
+    yearRangeInput.onchange = function () {
+        updateYearFilter(this.value);
+    };
+
+    // Étiquette pour afficher l'année sélectionnée
+    var selectedYearLabel = L.DomUtil.create('span', 'selected-year-label');
+    selectedYearLabel.id = 'selectedYear';
+    selectedYearLabel.textContent = currentYearFilter;
+
+    // Ajout des éléments au div du contrôle
+    div.appendChild(decreaseButton);
+    div.appendChild(yearRangeInput);
+    div.appendChild(increaseButton);
+    div.appendChild(selectedYearLabel);
+
     return div;
 };
 
 controlSlider.addTo(map);
+
+// Fonction pour augmenter l'année filtrée de 10 ans
+function incrementYear() {
+    if (currentYearFilter < yearFilterMax) {
+        currentYearFilter += 10; // Ajout de 10 années à la fois
+        updateYearFilter(currentYearFilter);
+    }
+}
+
+// Fonction pour diminuer l'année filtrée de 10 ans
+function decrementYear() {
+    if (currentYearFilter > yearFilterMin) {
+        currentYearFilter -= 10; // Soustraction de 10 années à la fois
+        updateYearFilter(currentYearFilter);
+    }
+}
+
+// Définition des types d'œuvres avec leurs clés et libellés
+var typesOfWork = {
+    manuscrit: 'manuscrit',
+    ['carte géographique']: 'carte géographique',
+    enluminure: 'enluminure',
+    bréviaire: 'bréviaire',
+    dessin: 'dessin',
+    peinture: 'peinture',
+    estampe: 'estampe'
+};
+
+// Ajout d'un contrôle de sélection pour filtrer par type d'œuvre
+var controlSelect = L.control({ position: 'topright' });
+
+controlSelect.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'type-filter-control');
+    div.innerHTML = '<h4>Filtrer par type d\'œuvre</h4>';
+
+    var selectHTML = '<select onchange="updateTypeFilter(this.value)">';
+    selectHTML += '<option value="">Tous les types</option>';
+    for (var key in typesOfWork) {
+        selectHTML += '<option value="' + key + '">' + typesOfWork[key] + '</option>';
+    }
+    selectHTML += '</select>';
+
+    div.innerHTML += selectHTML;
+
+    return div;
+};
+
+controlSelect.addTo(map);
+
+// Fonction pour filtrer les marqueurs par date de réalisation et type d'œuvre
+function filterMarkersByDateAndType(yearFilter, typeFilter) {
+    markers.clearLayers();
+
+    geojson_RAMA.features.forEach(function (feature) {
+        var identifiant = feature.properties.Identifiant;
+        var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
+        var type = feature.properties.Type;
+        var titre = feature.properties.Titre; // Récupérer le titre
+
+        // Vérifie si le type de l'œuvre contient le type filtré
+        if (isParent(identifiant) && dateYear <= yearFilter && (typeFilter === '' || type.includes(typeFilter))) {
+            var coordinates = feature.geometry.coordinates;
+            var marker = L.marker([coordinates[1], coordinates[0]]);
+            var parent = feature.properties.Parent;
+            var popupContent = createCarousel(parent, identifiant);
+
+            // Ajouter une infobulle au marqueur sans l'ouvrir automatiquement
+            var tooltip = marker.bindTooltip(leaflet-tooltip, titre, { // Utiliser le titre comme contenu de l'infobulle
+                direction: 'top' // Direction de l'infobulle
+            });
+
+            // Gérer l'affichage de l'infobulle lorsque le curseur survole le marqueur
+            marker.on('mouseover', function (e) {
+                tooltip.openTooltip(); // Ouvre l'infobulle lorsque le curseur survole le marqueur
+            });
+
+            marker.on('mouseout', function (e) {
+                tooltip.closeTooltip(); // Ferme l'infobulle lorsque le curseur quitte le marqueur
+            });
+
+            // Ajouter une fenêtre contextuelle (popup) au marqueur
+            marker.bindPopup(popupContent, {
+                maxWidth: 400
+            });
+
+            marker.on('popupclose', function () {
+                hideSlidebar();
+            });
+
+            markers.addLayer(marker);
+        }
+    });
+
+    map.addLayer(markers);
+}
+

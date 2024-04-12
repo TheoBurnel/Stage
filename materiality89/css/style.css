@@ -29,6 +29,12 @@ p b a:hover {
   text-shadow: 2px 1px 5px rgb(218, 218, 218);
 }
 
+.leaflet-popup {
+  opacity: 0.7;
+  background-color: white;
+}
+
+
 /* Styles pour les boutons */
 input[type="submit"], 
 button {
@@ -65,7 +71,7 @@ button:hover {
   right: 0;
   width: 400px;
   height: 100vh;
-  background-color: #f8f9fa;
+  background-color: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   overflow-y: auto;
@@ -130,23 +136,52 @@ a:hover {
   color: #0056b3;
 }
 
-/* Positionner le contrôle de filtre en bas */
+/* Style pour le contrôle de filtre par année */
 .year-filter-control {
-  position: relative;
-  left: 40%; /* Centrer horizontalement */
-  transform: translateX(-50%); /* Déplacer de -50% de la largeur du contrôle pour le centrer */
-  z-index: 1000; /* Assurer que le contrôle est au-dessus des autres éléments */
-  text-align: center; /* Centrer le contenu */
-  font-size: 20px; /* Taille de police plus grande */
-  padding: 10px; /* Espace intérieur */
-  border-radius: 8px; /* Coins arrondis */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombre légère */
+  background-color: white;
+  opacity: 0.7;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+}
+
+.year-filter-control h4 {
+  margin-top: 0;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+/* Style pour les boutons de la jauge d'année */
+.year-decrease-btn,
+.year-increase-btn {
+    border: none;
+    border-radius: 50%; /* Rendre les boutons circulaires */
+    color: white;
+    font-size: 18px; /* Taille de police */
+    width: 25px; /* Largeur fixe */
+    height: 25px; /* Hauteur fixe */
+    line-height: 25px; /* Centrage vertical du texte */
+    text-align: center; /* Centrage horizontal du texte */
+    cursor: pointer;
+    margin: 0 5px; /* Marge entre les boutons */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Ombre légère */
+    display: inline-flex; /* Utilisation de flexbox pour le centrage */
+    justify-content: center; /* Centrage horizontal */
+    align-items: center; /* Centrage vertical */
+}
+
+/* Style pour l'année sélectionnée dans le contrôle de filtre par année */
+.selected-year-label {
+  font-size: 16px; /* Taille de police augmentée */
+  font-weight: bold; /* Optionnel : pour mettre en gras */
+  color: #000; /* Couleur du texte */
 }
 
 
 /* Style pour le contrôle de sélection */
 .type-filter-control {
   background-color: white;
+  opacity: 0.7;
   padding: 10px;
   border: 2px solid #ccc;
   border-radius: 5px;
@@ -165,4 +200,16 @@ a:hover {
   font-size: 14px;
   border-radius: 3px;
   border: 1px solid #ccc;
+}
+
+/* Styles pour les infobulles des curseurs */
+.leaflet-tooltip {
+  opacity: 0.7; /* Opacité de l'infobulle du curseur */
+  background-color: rgba(255, 255, 255, 0.9); /* Couleur de fond de l'infobulle */
+  color: #333; /* Couleur du texte de l'infobulle */
+  border: none; /* Supprimer la bordure de l'infobulle */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); /* Ombre légère pour l'infobulle */
+  font-size: 14px; /* Taille de police de l'infobulle */
+  line-height: 1.4; /* Hauteur de ligne de l'infobulle */
+  padding: 8px 12px; /* Espacement intérieur de l'infobulle */
 }
