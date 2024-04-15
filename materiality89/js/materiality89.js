@@ -301,10 +301,10 @@ function filterMarkersByDateAndType(yearFilter, typeFilter) {
             var popupContent = createCarousel(parent, identifiant);
 
             // Ajouter une infobulle au marqueur sans l'ouvrir automatiquement
-            var tooltip = marker.bindTooltip(leaflet-tooltip, titre, { // Utiliser le titre comme contenu de l'infobulle
-                direction: 'top' // Direction de l'infobulle
-            });
-
+            var tooltip = L.tooltip(leaflet-tooltip).setContent(titre); // Utiliser le titre comme contenu de l'infobulle
+            
+            marker.bindTooltip(tooltip).openTooltip(); // Lier et ouvrir l'infobulle au marqueur
+            
             // Gérer l'affichage de l'infobulle lorsque le curseur survole le marqueur
             marker.on('mouseover', function (e) {
                 tooltip.openTooltip(); // Ouvre l'infobulle lorsque le curseur survole le marqueur
