@@ -34,6 +34,10 @@ p b a:hover {
   background-color: white;
 }
 
+.slidebar-link {
+  color: #4682b4; 
+  cursor: pointer; /* Définir le curseur comme pointeur au survol */
+}
 
 /* Styles pour les boutons */
 input[type="submit"], 
@@ -107,33 +111,41 @@ button:hover {
   height: 100%;
 }
 
-.slide {
-  display: none;
+/* Styles pour les boutons de navigation du carrousel */
+.carousel-prev,
+.carousel-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px; /* Taille des flèches */
+    color: #4682b4; /* Couleur des flèches */
+    background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent */
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    z-index: 1; /* Assurer que les flèches sont au-dessus du contenu */
 }
 
 .carousel-prev {
-  left: 10px;
+    left: 10px; /* Position à gauche */
 }
 
 .carousel-next {
-  right: 10px;
+    right: 10px; /* Position à droite */
 }
 
+/* Ajustement du contenu des diapositives pour éviter le chevauchement */
+.slide {
+    padding-right: 40px; /* Espace à droite pour éviter les flèches */
+}
+
+/* Styles pour le contenu du carrousel */
 .carousel-content {
   display: flex;
   flex-direction: column;
   gap: 20px;
   padding: 0 20px;
   position: relative;
-}
-
-/* Styles pour les liens */
-a {
-  color: #007bff;
-}
-
-a:hover {
-  color: #0056b3;
 }
 
 /* Style pour le contrôle de filtre par année */

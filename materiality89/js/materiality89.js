@@ -71,13 +71,13 @@ function createCarousel(parent, identifiant) {
     children.forEach(function (child, index) {
         var displayStyle = index === 0 ? 'block' : 'none';
 
-        carouselContent += "<div class='slide' style='display: " + displayStyle + ";'>";
+        carouselContent += "<div class='slide' style='display: " + displayStyle + "; padding-left: 30px;'>"; // Ajouter un padding à gauche pour décaler le texte
         carouselContent += "<h3>" + child.titre + "</h3>";
-        carouselContent += "<p>Identifiant: " + child.name + "</p>";
-        carouselContent += "<p>Caractéristique: " + (child.caracteristique || 'Donnée non disponible') + "</p>";
-        carouselContent += "<p>Technique(s): " + (child.technique || 'Donnée non disponible') + "</p>";
-        carouselContent += "<p>Couleur(s): " + (child.couleur || 'Donnée non disponible') + "</p>";
-        carouselContent += "<p>Matériau(x): " + (child.materiaux || 'Donnée non disponible') + "</p>";
+        carouselContent += "<p>Identifiant : " + child.name + "</p>";
+        carouselContent += "<p><u>Caractéristique</u>: " + (child.caracteristique || 'Donnée non disponible') + "</p>";
+        carouselContent += "<p><u>Technique(s)</u>: " + (child.technique || 'Donnée non disponible') + "</p>";
+        carouselContent += "<p><u>Couleur(s)</u>: " + (child.couleur || 'Donnée non disponible') + "</p>";
+        carouselContent += "<p><u>Matériau(x)</u>: " + (child.materiaux || 'Donnée non disponible') + "</p>";
         carouselContent += "<p class='slidebar-link' onclick='showSlidebar(" + JSON.stringify(child) + ")'>En savoir plus</p>";
         carouselContent += "</div>";
     });
@@ -86,6 +86,7 @@ function createCarousel(parent, identifiant) {
 
     return carouselContent;
 }
+
 
 // Fonction pour afficher la slidebar avec les détails de l'élément sélectionné
 function showSlidebar(child) {
@@ -98,26 +99,26 @@ function showSlidebar(child) {
                 <h2>${child.titre || '?'}</h2>
             </div>
             <div class="slidebar-body">
-                <p><u>Identification</u></p>
-                <p>Identifiant: ${child.name || '?'}</p>
-                <p>Type d'œuvre: ${child.type || '?'}</p>
-                <p>Représentation: ${child.representation || '?'}</p>
-                <p>Attribution: ${child.attribution || '?'}</p>
-                <p>Lieu de création: ${child.lieu || '?'}</p>
-                <p>Date de réalisation: ${child.realisation || '?'}</p>
-                <p><u>Description</u></p>
-                <p>Caractéristique: ${child.caracteristique || '?'}</p>
-                <p>Technique(s): ${child.technique || '?'}</p>
-                <p>Couleur(s): ${child.couleur || '?'}</p>
-                <p>Matériau(x): ${child.materiaux || '?'}</p>
-                <p>Certitude: ${child.certitude || '?'}</p>
-                <p>Mesure: ${child.mesure || '?'}</p>
-                <p>Date: ${child.date || '?'}</p>
-                <p>Rapport de l'analyse: ${child.rapport || '?'}</p>
-                <p>Source du rapport: ${child.source || '?'}</p>
-                <p><u>Lieu de conservation</u></p>
-                <p>Localisation: ${child.localisation || '?'}</p>
-                <p>Cote / numéro: ${child.cote || '?'}</p>
+                <p><b>Identification</b></p>
+                <p><u>Identifiant :</u> ${child.name || '?'}</p>
+                <p><u>Type d'œuvre :</u> ${child.type || '?'}</p>
+                <p><u>Représentation :</u> ${child.representation || '?'}</p>
+                <p><u>Attribution :</u> ${child.attribution || '?'}</p>
+                <p><u>Lieu de création :</u> ${child.lieu || '?'}</p>
+                <p><u>Date de réalisation :</u> ${child.realisation || '?'}</p>
+                <p><b>Description</b></p>
+                <p><u>Caractéristique :</u> ${child.caracteristique || '?'}</p>
+                <p><u>Technique(s) :</u> ${child.technique || '?'}</p>
+                <p><u>Couleur(s) :</u> ${child.couleur || '?'}</p>
+                <p><u>Matériau(x) :</u> ${child.materiaux || '?'}</p>
+                <p><u>Certitude :</u> ${child.certitude || '?'}</p>
+                <p><u>Mesure :</u> ${child.mesure || '?'}</p>
+                <p><u>Date :</u> ${child.date || '?'}</p>
+                <p><u>Rapport de l'analyse :</u> ${child.rapport || '?'}</p>
+                <p><u>Source du rapport :</u> ${child.source || '?'}</p>
+                <p><b>Lieu de conservation</b></p>
+                <p><u>Localisation :<u/> ${child.localisation || '?'}</p>
+                <p><u>Cote / numéro :</u> ${child.cote || '?'}</p>
             </div>
         </div>`;
 
