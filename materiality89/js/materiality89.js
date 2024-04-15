@@ -166,7 +166,6 @@ function nextSlide(button) {
 }
 
 
-
 // Variables pour les filtres par date
 var yearFilterMin = 400;
 var yearFilterMax = 1860;
