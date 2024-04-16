@@ -79,7 +79,7 @@ def csv_to_json(input_csv_path, output_json_path):
             couleur = escapeApostrophes(parse_value(row["schema:color"]))
             materiaux = escapeApostrophes(parse_value(row["schema:material"]))
             certitude = escapeApostrophes(parse_value(row['schema:status']))
-            technique = escapeApostrophes(parse_value(row["schema:measurementMethod"]))
+            technologie = escapeApostrophes(parse_value(row["schema:measurementMethod"]))
             mesure = escapeApostrophes(parse_value(row["schema:hasMeasurement"]))
             date = escapeApostrophes(parse_value(row["schema:observationDate"]))
             rapport = escapeApostrophes(parse_value(row['dcterms:abstract']))
@@ -107,7 +107,7 @@ def csv_to_json(input_csv_path, output_json_path):
                     "Couleur": couleur,
                     "Materiaux": materiaux,
                     "Certitude": certitude,
-                    "Technique": technique,
+                    "Technologie": technologie,
                     "Mesure": mesure,
                     "Date": date,
                     "Rapport": rapport,

@@ -8,7 +8,7 @@ chemin_fichier_csv = "../../bases/materiality89.csv"
 df = pd.read_csv(chemin_fichier_csv)
 
 # Vérifier le nom exact de la colonne contenant les données d'artMedium
-colonne_art_medium = 'schema:artform'
+colonne_art_medium = 'schema:artMedium'
 
 # Initialiser un compteur pour les noms d'artMedium
 compteur_noms = Counter()

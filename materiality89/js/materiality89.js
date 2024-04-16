@@ -29,6 +29,7 @@ function getChildrenByParent(parent) {
                 lieu: feature.properties.Lieu_de_creation || '?',
                 realisation: feature.properties.Realisation || '?',
                 caracteristique: feature.properties.Caracteristique || '?',
+                technologie: feature.properties.Technologie || '?',
                 technique: feature.properties.Technique || '?',
                 couleur: feature.properties.Couleur || '?',
                 materiaux: feature.properties.Materiaux || '?',
@@ -63,6 +64,8 @@ function hideParentTitle() {
     }
 }
 
+///////////////////////
+//CARROUSEL ET SLIDEBAR
 // Fonction pour créer le contenu du carrousel pour les enfants
 function createCarousel(parent, identifiant) {
     var carouselContent = "<div class='carousel'><div class='carousel-content'>";
@@ -87,7 +90,6 @@ function createCarousel(parent, identifiant) {
     return carouselContent;
 }
 
-
 // Fonction pour afficher la slidebar avec les détails de l'élément sélectionné
 function showSlidebar(child) {
     var slidebar = document.createElement('div');
@@ -108,7 +110,7 @@ function showSlidebar(child) {
                 <p><u>Date de réalisation :</u> ${child.realisation || '?'}</p>
                 <p><b>Description</b></p>
                 <p><u>Caractéristique :</u> ${child.caracteristique || '?'}</p>
-                <p><u>Technique(s) :</u> ${child.technique || '?'}</p>
+                <p><u>Technologie(s) :</u> ${child.technologie || '?'}</p>
                 <p><u>Couleur(s) :</u> ${child.couleur || '?'}</p>
                 <p><u>Matériau(x) :</u> ${child.materiaux || '?'}</p>
                 <p><u>Certitude :</u> ${child.certitude || '?'}</p>
@@ -165,25 +167,46 @@ function nextSlide(button) {
     hideSlidebar();
 }
 
+
+////////////////////////
+//FILTRES
 // Variables pour les filtres par date
 var yearFilterMin = 400;
 var yearFilterMax = 1860;
 var currentYearFilter = yearFilterMin;
 
+// Variables pour le filtre par type d'œuvre
+var currentTypeFilter = '';
+
+// Variables pour le filtre par couleur d'œuvre
+var currentColorFilter = '';
+
+// Variables pour le matériau
+var currentTechniqueFilter = '';
+
 // Fonction pour mettre à jour le filtre par année de réalisation
 function updateYearFilter(value) {
     currentYearFilter = parseInt(value);
     document.getElementById('selectedYear').textContent = currentYearFilter;
-    filterMarkersByDateTypeAndColor(currentYearFilter, currentTypeFilter, currentColorFilter);
+    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter, currentTechniqueFilter);
 }
-
-// Variables pour le filtre par type d'œuvre
-var currentTypeFilter = '';
 
 // Fonction pour mettre à jour le filtre par type d'œuvre
 function updateTypeFilter(value) {
     currentTypeFilter = value;
-    filterMarkersByDateTypeAndColor(currentYearFilter, currentTypeFilter, currentColorFilter);
+    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter, currentTechniqueFilter);
+}
+
+// Fonction pour mettre à jour le filtre par couleur
+function updateColorFilter(value) {
+    currentColorFilter = value;
+    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter, currentTechniqueFilter);
+}
+
+// Fonction pour mettre à jour le filtre par couleur
+function updateTechniqueFilter(value) {
+    currentTechniqueFilter = value;
+    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter, currentTechniqueFilter);
 }
 
 // Ajout du contrôle de sélection avec jauge pour filtrer par année de réalisation
@@ -293,12 +316,6 @@ var colors = {
     // Ajoutez d'autres couleurs si nécessaire
 };
 
-// Fonction pour mettre à jour le filtre par couleur
-function updateColorFilter(value) {
-    currentColorFilter = value;
-    filterMarkersByDateTypeAndColor(currentYearFilter, currentTypeFilter, currentColorFilter);
-}
-
 // Ajout d'un contrôle de sélection pour filtrer par couleur
 var colorFilterControl = L.control({ position: 'topright' });
 
@@ -320,55 +337,88 @@ colorFilterControl.onAdd = function (map) {
 
 colorFilterControl.addTo(map);
 
-// Variables pour le filtre par couleur d'œuvre
-var currentColorFilter = '';
+// Définition des techniques avec leurs clés et libellés
+var typeTechniques = {
+    doré: 'doré',
+    ['à l\'encre']: 'à l\'encre',
+    mélange: 'mélange',
+    goulache: 'goulache',
+    enluminé: 'enluminé',
+    juxtaposition: 'juxtaposition',
+    peint: 'peint'
+};
 
-function filterMarkersByDateTypeAndColor(yearFilter, typeFilter, colorFilter) {
+// Ajout d'un contrôle de sélection pour filtrer par technique
+var controlSelect = L.control({ position: 'topright' });
+
+controlSelect.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'technique-filter-control');
+    div.innerHTML = '<h4>Filtrer par technique</h4>';
+
+    var selectHTML = '<select onchange="updateTechniqueFilter(this.value)">';
+    selectHTML += '<option value="">Tous les types</option>';
+    for (var key in typeTechniques) {
+        selectHTML += '<option value="' + key + '">' + typeTechniques[key] + '</option>';
+    }
+    selectHTML += '</select>';
+
+    div.innerHTML += selectHTML;
+
+    return div;
+};
+
+controlSelect.addTo(map);
+
+///////////////////////
+//FONCTION POUR RECUPERER LES DONNEES
+function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, colorFilter, techniqueFilter) {
     markers.clearLayers();
 
     geojson_RAMA.features.forEach(function (feature) {
         var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
         var type = feature.properties.Type;
         var couleur = feature.properties.Couleur;
+        var technique = feature.properties.Technique;
         var titre = feature.properties.Titre;
 
-        // Filtrer uniquement sur la base de la date, du type d'œuvre et de la couleur
-        if (dateYear <= yearFilter && (typeFilter === '' || type.includes(typeFilter))) {
-            // Comparaison de la couleur filtrée avec la couleur réelle de l'œuvre
-            if (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase())) {
-                var coordinates = feature.geometry.coordinates;
-                var marker = L.marker([coordinates[1], coordinates[0]]);
-                var parent = feature.properties.Parent;
-                var identifiant = feature.properties.Identifiant;
-                var popupContent = createCarousel(parent, identifiant);
+        // Filtrer sur la base de la date, du type d'œuvre, de la couleur et du matériau
+        if (
+            dateYear <= yearFilter &&
+            (typeFilter === '' || type.includes(typeFilter)) &&
+            (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase())) &&
+            (techniqueFilter === '' || technique.toLowerCase().includes(techniqueFilter.toLowerCase()))
+        ) {
+            var coordinates = feature.geometry.coordinates;
+            var marker = L.marker([coordinates[1], coordinates[0]]);
+            var parent = feature.properties.Parent;
+            var identifiant = feature.properties.Identifiant;
+            var popupContent = createCarousel(parent, identifiant);
 
-                // Ajouter une infobulle au marqueur sans l'ouvrir automatiquement
-                var tooltip = L.tooltip().setContent(titre); // Utiliser le titre comme contenu de l'infobulle
+            // Ajouter une infobulle au marqueur sans l'ouvrir automatiquement
+            var tooltip = L.tooltip().setContent(titre); // Utiliser le titre comme contenu de l'infobulle
 
-                marker.bindTooltip(tooltip).openTooltip(); // Lier et ouvrir l'infobulle au marqueur
+            marker.bindTooltip(tooltip).openTooltip(); // Lier et ouvrir l'infobulle au marqueur
 
-                // Gérer l'affichage de l'infobulle lorsque le curseur survole le marqueur
-                marker.on('mouseover', function (e) {
-                    tooltip.openTooltip(); // Ouvre l'infobulle lorsque le curseur survole le marqueur
-                });
+            // Gérer l'affichage de l'infobulle lorsque le curseur survole le marqueur
+            marker.on('mouseover', function (e) {
+                tooltip.openTooltip(); // Ouvre l'infobulle lorsque le curseur survole le marqueur
+            });
 
-                marker.on('mouseout', function (e) {
-                    tooltip.closeTooltip(); // Ferme l'infobulle lorsque le curseur quitte le marqueur
-                });
+            marker.on('mouseout', function (e) {
+                tooltip.closeTooltip(); // Ferme l'infobulle lorsque le curseur quitte le marqueur
+            });
 
-                // Ajouter une fenêtre contextuelle (popup) au marqueur
-                marker.bindPopup(popupContent, {
-                    maxWidth: 400
-                });
+            // Ajouter une fenêtre contextuelle (popup) au marqueur
+            marker.bindPopup(popupContent, {
+                maxWidth: 400
+            });
 
-                marker.on('popupclose', function () {
-                    hideSlidebar();
-                });
+            marker.on('popupclose', function () {
+                hideSlidebar();
+            });
 
-                markers.addLayer(marker);
-            }
+            markers.addLayer(marker)
         }
     });
-
     map.addLayer(markers);
 }
