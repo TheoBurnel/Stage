@@ -323,25 +323,23 @@ colorFilterControl.addTo(map);
 // Variables pour le filtre par couleur d'œuvre
 var currentColorFilter = '';
 
-// Fonction pour filtrer les marqueurs par date de réalisation, type d'œuvre et couleur
-// Fonction pour filtrer les marqueurs par date de réalisation, type d'œuvre et couleur
 function filterMarkersByDateTypeAndColor(yearFilter, typeFilter, colorFilter) {
     markers.clearLayers();
 
     geojson_RAMA.features.forEach(function (feature) {
-        var identifiant = feature.properties.Identifiant;
         var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
         var type = feature.properties.Type;
         var couleur = feature.properties.Couleur;
-        var titre = feature.properties.Titre; // Récupérer le titre
+        var titre = feature.properties.Titre;
 
-        // Vérifie si le type de l'œuvre contient le type filtré et la couleur correspond à la couleur filtrée
-        if (isParent(identifiant) && dateYear <= yearFilter && (typeFilter === '' || type.includes(typeFilter))) {
-            // Comparaison de la couleur filtrée avec la couleur réelle de l'œuvre (ignorant les descriptions supplémentaires)
+        // Filtrer uniquement sur la base de la date, du type d'œuvre et de la couleur
+        if (dateYear <= yearFilter && (typeFilter === '' || type.includes(typeFilter))) {
+            // Comparaison de la couleur filtrée avec la couleur réelle de l'œuvre
             if (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase())) {
                 var coordinates = feature.geometry.coordinates;
                 var marker = L.marker([coordinates[1], coordinates[0]]);
                 var parent = feature.properties.Parent;
+                var identifiant = feature.properties.Identifiant;
                 var popupContent = createCarousel(parent, identifiant);
 
                 // Ajouter une infobulle au marqueur sans l'ouvrir automatiquement
