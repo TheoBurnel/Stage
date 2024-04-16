@@ -324,6 +324,7 @@ colorFilterControl.addTo(map);
 var currentColorFilter = '';
 
 // Fonction pour filtrer les marqueurs par date de réalisation, type d'œuvre et couleur
+// Fonction pour filtrer les marqueurs par date de réalisation, type d'œuvre et couleur
 function filterMarkersByDateTypeAndColor(yearFilter, typeFilter, colorFilter) {
     markers.clearLayers();
 
@@ -331,40 +332,43 @@ function filterMarkersByDateTypeAndColor(yearFilter, typeFilter, colorFilter) {
         var identifiant = feature.properties.Identifiant;
         var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
         var type = feature.properties.Type;
-        var color = feature.properties.Couleur;
+        var couleur = feature.properties.Couleur;
         var titre = feature.properties.Titre; // Récupérer le titre
 
         // Vérifie si le type de l'œuvre contient le type filtré et la couleur correspond à la couleur filtrée
-        if (isParent(identifiant) && dateYear <= yearFilter && (typeFilter === '' || type.includes(typeFilter)) && (colorFilter === '' || color === colorFilter)) {
-            var coordinates = feature.geometry.coordinates;
-            var marker = L.marker([coordinates[1], coordinates[0]]);
-            var parent = feature.properties.Parent;
-            var popupContent = createCarousel(parent, identifiant);
+        if (isParent(identifiant) && dateYear <= yearFilter && (typeFilter === '' || type.includes(typeFilter))) {
+            // Comparaison de la couleur filtrée avec la couleur réelle de l'œuvre (ignorant les descriptions supplémentaires)
+            if (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase())) {
+                var coordinates = feature.geometry.coordinates;
+                var marker = L.marker([coordinates[1], coordinates[0]]);
+                var parent = feature.properties.Parent;
+                var popupContent = createCarousel(parent, identifiant);
 
-            // Ajouter une infobulle au marqueur sans l'ouvrir automatiquement
-            var tooltip = L.tooltip(leaflet-tooltip).setContent(titre); // Utiliser le titre comme contenu de l'infobulle
-            
-            marker.bindTooltip(tooltip).openTooltip(); // Lier et ouvrir l'infobulle au marqueur
-            
-            // Gérer l'affichage de l'infobulle lorsque le curseur survole le marqueur
-            marker.on('mouseover', function (e) {
-                tooltip.openTooltip(); // Ouvre l'infobulle lorsque le curseur survole le marqueur
-            });
+                // Ajouter une infobulle au marqueur sans l'ouvrir automatiquement
+                var tooltip = L.tooltip().setContent(titre); // Utiliser le titre comme contenu de l'infobulle
 
-            marker.on('mouseout', function (e) {
-                tooltip.closeTooltip(); // Ferme l'infobulle lorsque le curseur quitte le marqueur
-            });
+                marker.bindTooltip(tooltip).openTooltip(); // Lier et ouvrir l'infobulle au marqueur
 
-            // Ajouter une fenêtre contextuelle (popup) au marqueur
-            marker.bindPopup(popupContent, {
-                maxWidth: 400
-            });
+                // Gérer l'affichage de l'infobulle lorsque le curseur survole le marqueur
+                marker.on('mouseover', function (e) {
+                    tooltip.openTooltip(); // Ouvre l'infobulle lorsque le curseur survole le marqueur
+                });
 
-            marker.on('popupclose', function () {
-                hideSlidebar();
-            });
+                marker.on('mouseout', function (e) {
+                    tooltip.closeTooltip(); // Ferme l'infobulle lorsque le curseur quitte le marqueur
+                });
 
-            markers.addLayer(marker);
+                // Ajouter une fenêtre contextuelle (popup) au marqueur
+                marker.bindPopup(popupContent, {
+                    maxWidth: 400
+                });
+
+                marker.on('popupclose', function () {
+                    hideSlidebar();
+                });
+
+                markers.addLayer(marker);
+            }
         }
     });
 
