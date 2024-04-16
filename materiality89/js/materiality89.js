@@ -100,25 +100,25 @@ function showSlidebar(child) {
             </div>
             <div class="slidebar-body">
                 <p><b>Identification</b></p>
-                <p><u>Identifiant :</u> ${child.name || '?'}</p>
-                <p><u>Type d'œuvre :</u> ${child.type || '?'}</p>
-                <p><u>Représentation :</u> ${child.representation || '?'}</p>
-                <p><u>Attribution :</u> ${child.attribution || '?'}</p>
-                <p><u>Lieu de création :</u> ${child.lieu || '?'}</p>
-                <p><u>Date de réalisation :</u> ${child.realisation || '?'}</p>
+                <p><u>Identifiant :</u> ${child.name || '?'}</p>
+                <p><u>Type d'œuvre :</u> ${child.type || '?'}</p>
+                <p><u>Représentation :</u> ${child.representation || '?'}</p>
+                <p><u>Attribution :</u> ${child.attribution || '?'}</p>
+                <p><u>Lieu de création :</u> ${child.lieu || '?'}</p>
+                <p><u>Date de réalisation :</u> ${child.realisation || '?'}</p>
                 <p><b>Description</b></p>
-                <p><u>Caractéristique :</u> ${child.caracteristique || '?'}</p>
-                <p><u>Technique(s) :</u> ${child.technique || '?'}</p>
-                <p><u>Couleur(s) :</u> ${child.couleur || '?'}</p>
-                <p><u>Matériau(x) :</u> ${child.materiaux || '?'}</p>
-                <p><u>Certitude :</u> ${child.certitude || '?'}</p>
-                <p><u>Mesure :</u> ${child.mesure || '?'}</p>
-                <p><u>Date :</u> ${child.date || '?'}</p>
-                <p><u>Rapport de l'analyse :</u> ${child.rapport || '?'}</p>
-                <p><u>Source du rapport :</u> ${child.source || '?'}</p>
+                <p><u>Caractéristique :</u> ${child.caracteristique || '?'}</p>
+                <p><u>Technique(s) :</u> ${child.technique || '?'}</p>
+                <p><u>Couleur(s) :</u> ${child.couleur || '?'}</p>
+                <p><u>Matériau(x) :</u> ${child.materiaux || '?'}</p>
+                <p><u>Certitude :</u> ${child.certitude || '?'}</p>
+                <p><u>Mesure :</u> ${child.mesure || '?'}</p>
+                <p><u>Date :</u> ${child.date || '?'}</p>
+                <p><u>Rapport de l'analyse :</u> ${child.rapport || '?'}</p>
+                <p><u>Source du rapport :</u> ${child.source || '?'}</p>
                 <p><b>Lieu de conservation</b></p>
-                <p><u>Localisation :<u/> ${child.localisation || '?'}</p>
-                <p><u>Cote / numéro :</u> ${child.cote || '?'}</p>
+                <p><u>Localisation :<u/> ${child.localisation || '?'}</p>
+                <p><u>Cote / numéro :</u> ${child.cote || '?'}</p>
             </div>
         </div>`;
 
@@ -165,7 +165,6 @@ function nextSlide(button) {
     hideSlidebar();
 }
 
-
 // Variables pour les filtres par date
 var yearFilterMin = 400;
 var yearFilterMax = 1860;
@@ -175,7 +174,7 @@ var currentYearFilter = yearFilterMin;
 function updateYearFilter(value) {
     currentYearFilter = parseInt(value);
     document.getElementById('selectedYear').textContent = currentYearFilter;
-    filterMarkersByDateAndType(currentYearFilter, currentTypeFilter);
+    filterMarkersByDateTypeAndColor(currentYearFilter, currentTypeFilter, currentColorFilter);
 }
 
 // Variables pour le filtre par type d'œuvre
@@ -184,7 +183,7 @@ var currentTypeFilter = '';
 // Fonction pour mettre à jour le filtre par type d'œuvre
 function updateTypeFilter(value) {
     currentTypeFilter = value;
-    filterMarkersByDateAndType(currentYearFilter, currentTypeFilter);
+    filterMarkersByDateTypeAndColor(currentYearFilter, currentTypeFilter, currentColorFilter);
 }
 
 // Ajout du contrôle de sélection avec jauge pour filtrer par année de réalisation
@@ -283,18 +282,60 @@ controlSelect.onAdd = function (map) {
 
 controlSelect.addTo(map);
 
-// Fonction pour filtrer les marqueurs par date de réalisation et type d'œuvre
-function filterMarkersByDateAndType(yearFilter, typeFilter) {
+// Définition des couleurs possibles avec leurs clés et libellés
+var colors = {
+    blanc: 'blanc',
+    noir: 'noir',
+    rouge: 'rouge',
+    vert: 'vert',
+    bleu: 'bleu',
+    jaune: 'jaune'
+    // Ajoutez d'autres couleurs si nécessaire
+};
+
+// Fonction pour mettre à jour le filtre par couleur
+function updateColorFilter(value) {
+    currentColorFilter = value;
+    filterMarkersByDateTypeAndColor(currentYearFilter, currentTypeFilter, currentColorFilter);
+}
+
+// Ajout d'un contrôle de sélection pour filtrer par couleur
+var colorFilterControl = L.control({ position: 'topright' });
+
+colorFilterControl.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'color-filter-control');
+    div.innerHTML = '<h4>Filtrer par couleur</h4>';
+
+    var selectHTML = '<select onchange="updateColorFilter(this.value)">';
+    selectHTML += '<option value="">Toutes les couleurs</option>';
+    for (var key in colors) {
+        selectHTML += '<option value="' + key + '">' + colors[key] + '</option>';
+    }
+    selectHTML += '</select>';
+
+    div.innerHTML += selectHTML;
+
+    return div;
+};
+
+colorFilterControl.addTo(map);
+
+// Variables pour le filtre par couleur d'œuvre
+var currentColorFilter = '';
+
+// Fonction pour filtrer les marqueurs par date de réalisation, type d'œuvre et couleur
+function filterMarkersByDateTypeAndColor(yearFilter, typeFilter, colorFilter) {
     markers.clearLayers();
 
     geojson_RAMA.features.forEach(function (feature) {
         var identifiant = feature.properties.Identifiant;
         var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
         var type = feature.properties.Type;
+        var color = feature.properties.Couleur;
         var titre = feature.properties.Titre; // Récupérer le titre
 
-        // Vérifie si le type de l'œuvre contient le type filtré
-        if (isParent(identifiant) && dateYear <= yearFilter && (typeFilter === '' || type.includes(typeFilter))) {
+        // Vérifie si le type de l'œuvre contient le type filtré et la couleur correspond à la couleur filtrée
+        if (isParent(identifiant) && dateYear <= yearFilter && (typeFilter === '' || type.includes(typeFilter)) && (colorFilter === '' || color === colorFilter)) {
             var coordinates = feature.geometry.coordinates;
             var marker = L.marker([coordinates[1], coordinates[0]]);
             var parent = feature.properties.Parent;
@@ -329,4 +370,3 @@ function filterMarkersByDateAndType(yearFilter, typeFilter) {
 
     map.addLayer(markers);
 }
-
