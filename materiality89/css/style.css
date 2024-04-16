@@ -225,3 +225,28 @@ button:hover {
   line-height: 1.4; /* Hauteur de ligne de l'infobulle */
   padding: 8px 12px; /* Espacement intérieur de l'infobulle */
 }
+
+/* Style pour le contrôle de filtrage par couleur */
+.color-filter-control {
+  background-color: white;
+  opacity: 0.7;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  font-family: Arial, sans-serif;
+}
+
+.color-filter-control h4 {
+  margin-top: 0;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+/* Style pour les options de sélection du contrôle de filtrage par couleur */
+.color-filter-control select {
+  width: 100%;
+  padding: 5px;
+  font-size: 14px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
