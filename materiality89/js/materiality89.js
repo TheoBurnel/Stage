@@ -14,6 +14,7 @@ function isParent(titre) {
     return titre && titre.trim() !== ''; // Considérer comme parent si le titre n'est pas vide
 }
 
+
 // Fonction pour récupérer les enfants par parent
 function getChildrenByParent(parent) {
     var children = [];
@@ -365,6 +366,7 @@ function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, col
         var couleur = feature.properties.Couleur;
         var technique = feature.properties.Technique;
         var parent = feature.properties.Parent;
+        var titre = feature.properties.Titre;
 
         // Filtrer sur la base de la date, du type d'œuvre, de la couleur et de la technique
         if (isParent(feature.properties.Identifiant)) {
@@ -382,28 +384,9 @@ function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, col
                     var popupContent = createCarousel(parent, identifiant);
 
                     // Ajouter une infobulle au marqueur
-                    var tooltip = L.tooltip().setContent(parent); // Utiliser le parent comme contenu de l'infobulle
+                    var tooltip = L.tooltip().setContent(titre); // Utiliser le parent comme contenu de l'infobulle
 
                     marker.bindTooltip(tooltip); // Lier l'infobulle au marqueur
-
-                    // Gérer l'affichage du titre du parent lorsque le curseur survole le marqueur
-                    marker.on('mouseover', function (e) {
-                        // Afficher le titre du parent
-                        var parentTitle = document.getElementById('parentTitle');
-                        if (parentTitle) {
-                            parentTitle.textContent = parent;
-                            // Autres actions à effectuer au survol du marqueur ici
-                        }
-                    });
-
-                    // Réinitialiser le titre du parent lorsque le curseur quitte le marqueur
-                    marker.on('mouseout', function (e) {
-                        var parentTitle = document.getElementById('parentTitle');
-                        if (parentTitle) {
-                            parentTitle.textContent = ''; // Effacer le titre du parent
-                            // Autres actions à effectuer lorsque le curseur quitte le marqueur ici
-                        }
-                    });
 
                     // Ajouter une fenêtre contextuelle (popup) au marqueur pour le carrousel complet
                     marker.bindPopup(popupContent, {
