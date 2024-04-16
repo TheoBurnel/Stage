@@ -10,8 +10,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 var markers = L.markerClusterGroup();
 
 // Fonction pour vérifier si c'est un parent (adulte)
-function isParent(identifiant) {
-    return identifiant.endsWith("_001");
+function isParent(titre) {
+    return titre && titre.trim() !== ''; // Considérer comme parent si le titre n'est pas vide
 }
 
 // Fonction pour récupérer les enfants par parent
@@ -48,24 +48,8 @@ function getChildrenByParent(parent) {
     return children;
 }
 
-// Fonction pour afficher le titre parent lorsque le curseur survole un marqueur
-function showParentTitle(e) {
-    var parentTitleElement = document.getElementById('parentTitle');
-    if (parentTitleElement) {
-        parentTitleElement.textContent = e.target.feature.properties.Parent;
-    }
-}
-
-// Fonction pour effacer le titre parent lorsque le curseur quitte un marqueur
-function hideParentTitle() {
-    var parentTitleElement = document.getElementById('parentTitle');
-    if (parentTitleElement) {
-        parentTitleElement.textContent = '';
-    }
-}
-
 ///////////////////////
-//CARROUSEL ET SLIDEBAR
+// CARROUSEL ET SLIDEBAR
 // Fonction pour créer le contenu du carrousel pour les enfants
 function createCarousel(parent, identifiant) {
     var carouselContent = "<div class='carousel'><div class='carousel-content'>";
@@ -167,9 +151,8 @@ function nextSlide(button) {
     hideSlidebar();
 }
 
-
 ////////////////////////
-//FILTRES
+// FILTRES
 // Variables pour les filtres par date
 var yearFilterMin = 400;
 var yearFilterMax = 1860;
@@ -181,7 +164,7 @@ var currentTypeFilter = '';
 // Variables pour le filtre par couleur d'œuvre
 var currentColorFilter = '';
 
-// Variables pour le matériau
+// Variables pour le filtre par technique
 var currentTechniqueFilter = '';
 
 // Fonction pour mettre à jour le filtre par année de réalisation
@@ -203,7 +186,7 @@ function updateColorFilter(value) {
     filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter, currentTechniqueFilter);
 }
 
-// Fonction pour mettre à jour le filtre par couleur
+// Fonction pour mettre à jour le filtre par technique
 function updateTechniqueFilter(value) {
     currentTechniqueFilter = value;
     filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter, currentTechniqueFilter);
@@ -370,55 +353,75 @@ controlSelect.onAdd = function (map) {
 controlSelect.addTo(map);
 
 ///////////////////////
-//FONCTION POUR RECUPERER LES DONNEES
+// FONCTION POUR RÉCUPÉRER LES DONNÉES
 function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, colorFilter, techniqueFilter) {
     markers.clearLayers();
+
+    var parentMarkers = {}; // Dictionnaire pour suivre les parents pour lesquels nous avons ajouté un marqueur
 
     geojson_RAMA.features.forEach(function (feature) {
         var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
         var type = feature.properties.Type;
         var couleur = feature.properties.Couleur;
         var technique = feature.properties.Technique;
-        var titre = feature.properties.Titre;
+        var parent = feature.properties.Parent;
 
-        // Filtrer sur la base de la date, du type d'œuvre, de la couleur et du matériau
-        if (
-            dateYear <= yearFilter &&
-            (typeFilter === '' || type.includes(typeFilter)) &&
-            (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase())) &&
-            (techniqueFilter === '' || technique.toLowerCase().includes(techniqueFilter.toLowerCase()))
-        ) {
-            var coordinates = feature.geometry.coordinates;
-            var marker = L.marker([coordinates[1], coordinates[0]]);
-            var parent = feature.properties.Parent;
-            var identifiant = feature.properties.Identifiant;
-            var popupContent = createCarousel(parent, identifiant);
+        // Filtrer sur la base de la date, du type d'œuvre, de la couleur et de la technique
+        if (isParent(feature.properties.Identifiant)) {
+            if (
+                dateYear <= yearFilter &&
+                (typeFilter === '' || type.includes(typeFilter)) &&
+                (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase())) &&
+                (techniqueFilter === '' || technique.toLowerCase().includes(techniqueFilter.toLowerCase()))
+            ) {
+                if (!(parent in parentMarkers)) {
+                    // Si ce parent n'a pas encore de marqueur, ajoutons-en un
+                    var coordinates = feature.geometry.coordinates;
+                    var marker = L.marker([coordinates[1], coordinates[0]]);
+                    var identifiant = feature.properties.Identifiant;
+                    var popupContent = createCarousel(parent, identifiant);
 
-            // Ajouter une infobulle au marqueur sans l'ouvrir automatiquement
-            var tooltip = L.tooltip().setContent(titre); // Utiliser le titre comme contenu de l'infobulle
+                    // Ajouter une infobulle au marqueur
+                    var tooltip = L.tooltip().setContent(parent); // Utiliser le parent comme contenu de l'infobulle
 
-            marker.bindTooltip(tooltip).openTooltip(); // Lier et ouvrir l'infobulle au marqueur
+                    marker.bindTooltip(tooltip); // Lier l'infobulle au marqueur
 
-            // Gérer l'affichage de l'infobulle lorsque le curseur survole le marqueur
-            marker.on('mouseover', function (e) {
-                tooltip.openTooltip(); // Ouvre l'infobulle lorsque le curseur survole le marqueur
-            });
+                    // Gérer l'affichage du titre du parent lorsque le curseur survole le marqueur
+                    marker.on('mouseover', function (e) {
+                        // Afficher le titre du parent
+                        var parentTitle = document.getElementById('parentTitle');
+                        if (parentTitle) {
+                            parentTitle.textContent = parent;
+                            // Autres actions à effectuer au survol du marqueur ici
+                        }
+                    });
 
-            marker.on('mouseout', function (e) {
-                tooltip.closeTooltip(); // Ferme l'infobulle lorsque le curseur quitte le marqueur
-            });
+                    // Réinitialiser le titre du parent lorsque le curseur quitte le marqueur
+                    marker.on('mouseout', function (e) {
+                        var parentTitle = document.getElementById('parentTitle');
+                        if (parentTitle) {
+                            parentTitle.textContent = ''; // Effacer le titre du parent
+                            // Autres actions à effectuer lorsque le curseur quitte le marqueur ici
+                        }
+                    });
 
-            // Ajouter une fenêtre contextuelle (popup) au marqueur
-            marker.bindPopup(popupContent, {
-                maxWidth: 400
-            });
+                    // Ajouter une fenêtre contextuelle (popup) au marqueur pour le carrousel complet
+                    marker.bindPopup(popupContent, {
+                        maxWidth: 400
+                    });
 
-            marker.on('popupclose', function () {
-                hideSlidebar();
-            });
+                    marker.on('popupclose', function () {
+                        hideSlidebar();
+                    });
 
-            markers.addLayer(marker)
+                    markers.addLayer(marker);
+
+                    // Marquer ce parent comme ayant un marqueur ajouté
+                    parentMarkers[parent] = true;
+                }
+            }
         }
     });
+
     map.addLayer(markers);
 }
