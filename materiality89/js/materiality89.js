@@ -61,10 +61,18 @@ function createCarousel(parent, identifiant) {
         carouselContent += "<div class='slide' style='display: " + displayStyle + "; padding-left: 30px;'>"; // Ajouter un padding à gauche pour décaler le texte
         carouselContent += "<h3>" + child.titre + "</h3>";
         carouselContent += "<p>Identifiant : " + child.name + "</p>";
-        carouselContent += "<p><u>Caractéristique</u>: " + (child.caracteristique || 'Donnée non disponible') + "</p>";
-        carouselContent += "<p><u>Technique(s)</u>: " + (child.technique || 'Donnée non disponible') + "</p>";
-        carouselContent += "<p><u>Couleur(s)</u>: " + (child.couleur || 'Donnée non disponible') + "</p>";
-        carouselContent += "<p><u>Matériau(x)</u>: " + (child.materiaux || 'Donnée non disponible') + "</p>";
+        if (child.caracteristique && child.caracteristique !== '?') {
+            carouselContent += "<p><u>Caractéristique</u>: " + child.caracteristique + "</p>";
+        }
+        if (child.technique && child.technique !== '?') {
+            carouselContent += "<p><u>Technique(s)</u>: " + child.technique + "</p>";
+        }
+        if (child.couleur && child.couleur !== '?') {
+            carouselContent += "<p><u>Couleur(s)</u>: " + child.couleur + "</p>";
+        }
+        if (child.materiaux && child.materiaux !== '?') {
+            carouselContent += "<p><u>Matériau(x)</u>: " + child.materiaux + "</p>";
+        }
         carouselContent += "<p class='slidebar-link' onclick='showSlidebar(" + JSON.stringify(child) + ")'>En savoir plus</p>";
         carouselContent += "</div>";
     });
@@ -78,7 +86,9 @@ function createCarousel(parent, identifiant) {
 function showSlidebar(child) {
     var slidebar = document.createElement('div');
     slidebar.className = 'slidebar';
-    slidebar.innerHTML = `
+
+    // Création du contenu HTML de la slidebar en vérifiant les valeurs
+    var slidebarContent = `
         <div class="slidebar-content">
             <button class="close-btn" onclick="hideSlidebar()">&raquo;</button>
             <div class="slidebar-header">
@@ -86,33 +96,76 @@ function showSlidebar(child) {
             </div>
             <div class="slidebar-body">
                 <p><b>Identification</b></p>
-                <p><u>Identifiant :</u> ${child.name || '?'}</p>
-                <p><u>Type d'œuvre :</u> ${child.type || '?'}</p>
-                <p><u>Attribution :</u> ${child.attribution || '?'}</p>
-                <p><u>Lieu de création :</u> ${child.lieu || '?'}</p>
-                <p><u>Date de réalisation :</u> ${child.realisation || '?'}</p>
-                <p><b>Description</b></p>
-                <p><u>Type :</u> ${child.type_description || '?'}</p>
-                <p><u>Caractéristique :</u> ${child.caracteristique || '?'}</p>
-                <p><u>Technologie(s) :</u> ${child.technologie || '?'}</p>
-                <p><u>Couleur(s) :</u> ${child.couleur || '?'}</p>
-                <p><u>Matériau(x) :</u> ${child.materiaux || '?'}</p>
-                <p><u>Certitude :</u> ${child.certitude || '?'}</p>
-                <p><u>Mesure :</u> ${child.mesure || '?'}</p>
-                <p><u>Date :</u> ${child.date || '?'}</p>
-                <p><u>Rapport de l'analyse :</u> ${child.rapport || '?'}</p>
-                <p><u>Source du rapport :</u> ${child.source || '?'}</p>
-                <p><b>Lieu de conservation</b></p>
-                <p><u>Localisation :</u> ${child.localisation || '?'}</p>
-                <p><u>Cote / numéro :</u> ${child.cote || '?'}</p>
+                <p><u>Identifiant :</u> ${child.name || '?'}</p>`;
+
+    if (child.type && child.type !== '?') {
+        slidebarContent += `<p><u>Type d'œuvre :</u> ${child.type}</p>`;
+    }
+    if (child.attribution && child.attribution !== '?') {
+        slidebarContent += `<p><u>Attribution :</u> ${child.attribution}</p>`;
+    }
+    if (child.lieu && child.lieu !== '?') {
+        slidebarContent += `<p><u>Lieu de création :</u> ${child.lieu}</p>`;
+    }
+    if (child.realisation && child.realisation !== '?') {
+        slidebarContent += `<p><u>Date de réalisation :</u> ${child.realisation}</p>`;
+    }
+    
+    slidebarContent += `<p><b>Description</b></p>`;
+    
+    if (child.type_description && child.type_description !== '?') {
+        slidebarContent += `<p><u>Type :</u> ${child.type_description}</p>`;
+    }
+    if (child.caracteristique && child.caracteristique !== '?') {
+        slidebarContent += `<p><u>Caractéristique :</u> ${child.caracteristique}</p>`;
+    }
+    if (child.technologie && child.technologie !== '?') {
+        slidebarContent += `<p><u>Technologie(s) :</u> ${child.technologie}</p>`;
+    }
+    if (child.couleur && child.couleur !== '?') {
+        slidebarContent += `<p><u>Couleur(s) :</u> ${child.couleur}</p>`;
+    }
+    if (child.materiaux && child.materiaux !== '?') {
+        slidebarContent += `<p><u>Matériau(x) :</u> ${child.materiaux}</p>`;
+    }
+    if (child.certitude && child.certitude !== '?') {
+        slidebarContent += `<p><u>Certitude :</u> ${child.certitude}</p>`;
+    }
+    if (child.mesure && child.mesure !== '?') {
+        slidebarContent += `<p><u>Mesure :</u> ${child.mesure}</p>`;
+    }
+    if (child.date && child.date !== '?') {
+        slidebarContent += `<p><u>Date :</u> ${child.date}</p>`;
+    }
+    if (child.rapport && child.rapport !== '?') {
+        slidebarContent += `<p><u>Rapport de l'analyse :</u> ${child.rapport}</p>`;
+    }
+    if (child.source && child.source !== '?') {
+        slidebarContent += `<p><u>Source du rapport :</u> ${child.source}</p>`;
+    }
+
+    slidebarContent += `
+                <p><b>Lieu de conservation</b></p>`;
+                
+    if (child.localisation && child.localisation !== '?') {
+        slidebarContent += `<p><u>Localisation :</u> ${child.localisation}</p>`;
+    }
+    if (child.cote && child.cote !== '?') {
+        slidebarContent += `<p><u>Cote / numéro :</u> ${child.cote}</p>`;
+    }
+    
+    slidebarContent += `
             </div>
         </div>`;
+
+    slidebar.innerHTML = slidebarContent;
 
     document.body.appendChild(slidebar);
     setTimeout(function () {
         slidebar.style.transform = 'translateX(0)';
     }, 100);
 }
+
 
 // Fonction pour masquer et supprimer la slidebar
 function hideSlidebar() {
