@@ -68,7 +68,6 @@ def csv_to_json(input_csv_path, output_json_path):
             titre = escapeApostrophes(parse_value(row["dcterms:title"]))
             parent = escapeApostrophes(parse_value(row["crm:P106_forms_part_of"]))
             type = escapeApostrophes(parse_value(row["schema:artform"]))
-            representation = escapeApostrophes(parse_value(row['dcterms:subject']))
             attribution = escapeApostrophes(parse_value(row['schema:creator']))
             ville = escapeApostrophes(parse_value(row["schema:locationCreated"]))
             realisation = escapeApostrophes(parse_value(row["crm:P4_has_time-span"]))
@@ -98,7 +97,6 @@ def csv_to_json(input_csv_path, output_json_path):
                     "Titre": titre,
                     "Parent": parent,
                     "Type": type,
-                    "Representation": representation,
                     "Attribution": attribution,
                     "Lieu_de_creation": ville,
                     "Realisation": realisation,

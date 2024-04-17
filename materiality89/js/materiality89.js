@@ -14,7 +14,6 @@ function isParent(titre) {
     return titre && titre.trim() !== ''; // Considérer comme parent si le titre n'est pas vide
 }
 
-
 // Fonction pour récupérer les enfants par parent
 function getChildrenByParent(parent) {
     var children = [];
@@ -25,7 +24,6 @@ function getChildrenByParent(parent) {
                 titre: feature.properties.Titre || '?',
                 name: feature.properties.Identifiant || '?',
                 type: feature.properties.Type || '?',
-                representation: feature.properties.Representation || '?',
                 attribution: feature.properties.Attribution || '?',
                 lieu: feature.properties.Lieu_de_creation || '?',
                 realisation: feature.properties.Realisation || '?',
@@ -90,7 +88,6 @@ function showSlidebar(child) {
                 <p><b>Identification</b></p>
                 <p><u>Identifiant :</u> ${child.name || '?'}</p>
                 <p><u>Type d'œuvre :</u> ${child.type || '?'}</p>
-                <p><u>Représentation :</u> ${child.representation || '?'}</p>
                 <p><u>Attribution :</u> ${child.attribution || '?'}</p>
                 <p><u>Lieu de création :</u> ${child.lieu || '?'}</p>
                 <p><u>Date de réalisation :</u> ${child.realisation || '?'}</p>
@@ -167,33 +164,25 @@ var currentTypeFilter = '';
 // Variables pour le filtre par couleur d'œuvre
 var currentColorFilter = '';
 
-// Variables pour le filtre par technique
-var currentTechniqueFilter = '';
-
 // Fonction pour mettre à jour le filtre par année de réalisation
 function updateYearFilter(value) {
     currentYearFilter = parseInt(value);
     document.getElementById('selectedYear').textContent = currentYearFilter;
-    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter, currentTechniqueFilter);
+    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter);
 }
 
 // Fonction pour mettre à jour le filtre par type d'œuvre
 function updateTypeFilter(value) {
     currentTypeFilter = value;
-    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter, currentTechniqueFilter);
+    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter);
 }
 
 // Fonction pour mettre à jour le filtre par couleur
 function updateColorFilter(value) {
     currentColorFilter = value;
-    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter, currentTechniqueFilter);
+    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter);
 }
 
-// Fonction pour mettre à jour le filtre par technique
-function updateTechniqueFilter(value) {
-    currentTechniqueFilter = value;
-    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter, currentTechniqueFilter);
-}
 
 // Ajout du contrôle de sélection avec jauge pour filtrer par année de réalisation
 var controlSlider = L.control({ position: 'topright' });
@@ -323,41 +312,9 @@ colorFilterControl.onAdd = function (map) {
 
 colorFilterControl.addTo(map);
 
-// Définition des techniques avec leurs clés et libellés
-var typeTechniques = {
-    doré: 'doré',
-    ['à l\'encre']: 'à l\'encre',
-    mélange: 'mélange',
-    goulache: 'goulache',
-    enluminé: 'enluminé',
-    juxtaposition: 'juxtaposition',
-    peint: 'peint'
-};
-
-// Ajout d'un contrôle de sélection pour filtrer par technique
-var controlSelect = L.control({ position: 'topright' });
-
-controlSelect.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'technique-filter-control');
-    div.innerHTML = '<h4>Filtrer par technique</h4>';
-
-    var selectHTML = '<select onchange="updateTechniqueFilter(this.value)">';
-    selectHTML += '<option value="">Tous les types</option>';
-    for (var key in typeTechniques) {
-        selectHTML += '<option value="' + key + '">' + typeTechniques[key] + '</option>';
-    }
-    selectHTML += '</select>';
-
-    div.innerHTML += selectHTML;
-
-    return div;
-};
-
-controlSelect.addTo(map);
-
 ///////////////////////
 // FONCTION POUR RÉCUPÉRER LES DONNÉES
-function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, colorFilter, techniqueFilter) {
+function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, colorFilter) {
     markers.clearLayers();
 
     var parentMarkers = {}; // Dictionnaire pour suivre les parents pour lesquels nous avons ajouté un marqueur
@@ -366,7 +323,6 @@ function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, col
         var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
         var type = feature.properties.Type;
         var couleur = feature.properties.Couleur;
-        var technique = feature.properties.Technique;
         var parent = feature.properties.Parent;
         var titre = feature.properties.Titre;
 
@@ -375,8 +331,7 @@ function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, col
             if (
                 dateYear <= yearFilter &&
                 (typeFilter === '' || type.includes(typeFilter)) &&
-                (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase())) &&
-                (techniqueFilter === '' || technique.toLowerCase().includes(techniqueFilter.toLowerCase()))
+                (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase()))
             ) {
                 if (!(parent in parentMarkers)) {
                     // Si ce parent n'a pas encore de marqueur, ajoutons-en un
@@ -390,23 +345,23 @@ function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, col
 
                     marker.bindTooltip(tooltip); // Lier l'infobulle au marqueur
 
-                    // Ajouter une fenêtre contextuelle (popup) au marqueur pour le carrousel complet
-                    marker.bindPopup(popupContent, {
-                        maxWidth: 400
-                    });
+                        // Ajouter une fenêtre contextuelle (popup) au marqueur pour le carrousel complet
+                        marker.bindPopup(popupContent, {
+                            maxWidth: 400
+                        });
 
-                    marker.on('popupclose', function () {
-                        hideSlidebar();
-                    });
+                        marker.on('popupclose', function () {
+                            hideSlidebar();
+                        });
 
-                    markers.addLayer(marker);
+                        markers.addLayer(marker);
 
-                    // Marquer ce parent comme ayant un marqueur ajouté
-                    parentMarkers[parent] = true;
-                }
+                        // Marquer ce parent comme ayant un marqueur ajouté
+                        parentMarkers[parent] = true;
+                    }
             }
-        }
-    });
+            }
+        });
 
     map.addLayer(markers);
 }
