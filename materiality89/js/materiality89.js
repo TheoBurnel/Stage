@@ -29,6 +29,7 @@ function getChildrenByParent(parent) {
                 attribution: feature.properties.Attribution || '?',
                 lieu: feature.properties.Lieu_de_creation || '?',
                 realisation: feature.properties.Realisation || '?',
+                type_description: feature.properties.Type_description || '?',
                 caracteristique: feature.properties.Caracteristique || '?',
                 technologie: feature.properties.Technologie || '?',
                 technique: feature.properties.Technique || '?',
@@ -94,6 +95,7 @@ function showSlidebar(child) {
                 <p><u>Lieu de création :</u> ${child.lieu || '?'}</p>
                 <p><u>Date de réalisation :</u> ${child.realisation || '?'}</p>
                 <p><b>Description</b></p>
+                <p><u>Type :</u> ${child.type_description || '?'}</p>
                 <p><u>Caractéristique :</u> ${child.caracteristique || '?'}</p>
                 <p><u>Technologie(s) :</u> ${child.technologie || '?'}</p>
                 <p><u>Couleur(s) :</u> ${child.couleur || '?'}</p>
@@ -104,7 +106,7 @@ function showSlidebar(child) {
                 <p><u>Rapport de l'analyse :</u> ${child.rapport || '?'}</p>
                 <p><u>Source du rapport :</u> ${child.source || '?'}</p>
                 <p><b>Lieu de conservation</b></p>
-                <p><u>Localisation :<u/> ${child.localisation || '?'}</p>
+                <p><u>Localisation :</u> ${child.localisation || '?'}</p>
                 <p><u>Cote / numéro :</u> ${child.cote || '?'}</p>
             </div>
         </div>`;

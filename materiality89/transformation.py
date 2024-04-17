@@ -74,6 +74,7 @@ def csv_to_json(input_csv_path, output_json_path):
             realisation = escapeApostrophes(parse_value(row["crm:P4_has_time-span"]))
             date_filtre = escapeApostrophes(pour_filtre(row["crm:P4_has_time-span"]))
             identifiant = escapeApostrophes(parse_value(row["schema:identifier"]))
+            type_description = escapeApostrophes(parse_value(row['crm:P2_has_type']))
             caracteristique = escapeApostrophes(parse_value(row["dcterms:type"]))
             technique = escapeApostrophes(parse_value(row["schema:artMedium"]))
             couleur = escapeApostrophes(parse_value(row["schema:color"]))
@@ -102,6 +103,7 @@ def csv_to_json(input_csv_path, output_json_path):
                     "Lieu_de_creation": ville,
                     "Realisation": realisation,
                     "Identifiant": identifiant,
+                    "Type_description": type_description,
                     "Caracteristique": caracteristique,
                     "Technique": technique,
                     "Couleur": couleur,
