@@ -1,4 +1,3 @@
-
 import csv
 import json
 import os
@@ -51,7 +50,8 @@ def escapeApostrophes(text):
 
 def csv_to_json(input_csv_path, output_json_path):
     data = []
-    
+    parent_suffix_count = {}  # Dictionnaire pour suivre les suffixes numériques des parents
+
     with open(input_csv_path, 'r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.DictReader(csv_file)
         
@@ -67,6 +67,33 @@ def csv_to_json(input_csv_path, output_json_path):
             # Parse et échapper les valeurs de chaînes de caractères
             titre = escapeApostrophes(parse_value(row["dcterms:title"]))
             parent = escapeApostrophes(parse_value(row["crm:P106_forms_part_of"]))
+            
+            # Vérifier si le parent existe déjà dans le dictionnaire
+            if parent in parent_suffix_count:
+                # Parent existe, vérifier les coordonnées
+                if parent_suffix_count[parent]["coordinates"] != coordinates:
+                    # Coordonnées différentes, incrémenter le suffixe numérique du parent
+                    parent_suffix_count[parent]["suffix"] += 1
+                    new_parent = f"{parent}_{parent_suffix_count[parent]['suffix']}"
+                    parent_suffix_count[new_parent] = {
+                        "coordinates": coordinates,
+                        "suffix": 0  # Réinitialiser le suffixe pour le nouveau parent
+                    }
+                    parent = new_parent
+                else:
+                    parent_suffix_count[parent]["coordinates"] = coordinates
+                    parent_suffix_count[parent] = {
+                    "coordinates": coordinates,
+                    "suffix": 0
+                }
+            else:
+                # Nouveau parent, initialiser le suffixe à 0
+                parent_suffix_count[parent] = {
+                    "coordinates": coordinates,
+                    "suffix": 0
+                }
+                
+            # Parse et échapper les valeurs de chaînes de caractères
             type = escapeApostrophes(parse_value(row["schema:artform"]))
             attribution = escapeApostrophes(parse_value(row['schema:creator']))
             ville = escapeApostrophes(parse_value(row["schema:locationCreated"]))
@@ -140,4 +167,3 @@ json_output_path = 'data/materiality89.js'
 csv_to_json(csv_input_path, json_output_path)
 
 print("Conversion CSV vers JSON réussie !")
-
