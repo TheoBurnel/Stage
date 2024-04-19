@@ -133,7 +133,7 @@ def csv_to_json(input_csv_path, output_json_path):
         json.dump({"type": "FeatureCollection", "features": data}, json_file, indent=4, ensure_ascii=False)
 
 # Spécifiez le chemin du fichier CSV en entrée et du fichier JSON en sortie
-csv_input_path = '../../bases/materiality89.csv'
+csv_input_path = 'donnees/localisation.csv'
 json_output_path = 'data/materiality89.js'
 
 # Appeler la fonction pour convertir le fichier CSV en JSON

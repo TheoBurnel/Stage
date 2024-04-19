@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 # Chemin vers le fichier CSV initial
-csv_path = "localisation.csv"
+csv_path = "donnees/materiality89.csv"
 
 # Charger les données en ne sélectionnant que les colonnes pertinentes
 data = pd.read_csv(csv_path)
@@ -77,7 +77,7 @@ not_kept_data = data[~data['schema:geographicArea'].fillna('').str.contains('§'
 final_data = pd.concat([filtered_data, not_kept_data], ignore_index=True)
 
 # Enregistrer le DataFrame final dans un nouveau fichier CSV
-new_csv_path = "localisation_complete.csv"
+new_csv_path = "donnees/localisation.csv"
 final_data.to_csv(new_csv_path, index=False)
 
 print(f"Les données filtrées avec les lignes non retenues ont été enregistrées dans : {new_csv_path}")
