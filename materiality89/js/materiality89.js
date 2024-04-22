@@ -303,34 +303,57 @@ function decrementYear() {
 
 // Définition des matériaux avec leurs clés et libellés
 var matériaux = {
-    ['blanc de plomb']: 'blanc de plomb',
+    'blanc de plomb': 'blanc de plomb',
     vermillon: 'vermillon',
     or: 'or',
-    ['lapis-lazuli']: 'lapis-lazuli',
+    'lapis-lazuli': 'lapis-lazuli',
     indigo: 'indigo',
-    ['oxyde de plomb']: 'oxyde de plomb'
+    'oxyde de plomb': 'oxyde de plomb'
 };
 
-// Ajout d'un contrôle de sélection pour filtrer par matériau
+// Fonction pour mettre à jour l'affichage en fonction du texte saisi
+function searchMateriau(searchText) {
+    // Sélectionner tous les éléments de matériau
+    var materialElements = document.querySelectorAll('.material-item');
+
+    // Parcourir chaque élément et le cacher ou l'afficher en fonction de la correspondance avec le texte saisi
+    materialElements.forEach(function(element) {
+        var materialName = element.textContent.toLowerCase(); // Récupérer le nom du matériau en minuscules
+        var isVisible = materialName.includes(searchText.toLowerCase()); // Vérifier si le texte est présent dans le nom du matériau
+
+        // Afficher ou masquer l'élément en fonction de la visibilité
+        element.style.display = isVisible ? 'block' : 'none';
+    });
+}
+
+// Ajout d'un contrôle de recherche de matériau
 var controlSelect = L.control({ position: 'topright' });
 
 controlSelect.onAdd = function (map) {
     var div = L.DomUtil.create('div', 'type-filter-control');
     div.innerHTML = '<h4>Filtrer par type de matériau</h4>';
 
-    var selectHTML = '<select onchange="updateMateriauFilter(this.value)">';
-    selectHTML += '<option value="">Tous les types</option>';
-    for (var key in matériaux) {
-        selectHTML += '<option value="' + key + '">' + matériaux[key] + '</option>';
-    }
-    selectHTML += '</select>';
+    // Champ d'entrée pour rechercher un matériau
+    var inputHTML = '<input type="text" placeholder="Rechercher" onkeyup="searchMateriau(this.value)">';
+    div.innerHTML += inputHTML;
 
-    div.innerHTML += selectHTML;
+    // Liste des matériaux à afficher avec une classe pour le filtrage
+    div.innerHTML += '<ul id="material-list">';
+    for (var key in matériaux) {
+        div.innerHTML += '<li class="material-item" onclick="selectMaterial(\'' + matériaux[key] + '\')">' + matériaux[key] + '</li>';
+    }    
+    div.innerHTML += '</ul>';
 
     return div;
 };
 
+function selectMaterial(material) {
+    updateMateriauFilter(material);
+}
+
+// Ajouter le contrôle de recherche à la carte
 controlSelect.addTo(map);
+
 
 // Définition des couleurs possibles avec leurs clés et libellés
 var colors = {
@@ -369,7 +392,7 @@ colorFilterControl.addTo(map);
 function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, colorFilter) {
     markers.clearLayers();
 
-    var parentMarkers = {}; // Dictionnaire pour suivre les parents pour lesquels nous avons ajouté un marqueur
+    var parentMarkers = {};
 
     geojson_RAMA.features.forEach(function (feature) {
         var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
@@ -378,7 +401,10 @@ function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, 
         var parent = feature.properties.Parent;
         var titre = feature.properties.Titre;
 
-        // Filtrer sur la base de la date, du type d'œuvre, de la couleur et du matériau
+        // Debugging: Log information for each feature
+        console.log("Feature:", feature.properties);
+
+        // Filter based on date, material, and color
         if (isParent(feature.properties.Identifiant)) {
             if (
                 dateYear <= yearFilter &&
@@ -386,18 +412,15 @@ function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, 
                 (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase()))
             ) {
                 if (!(parent in parentMarkers)) {
-                    // Si ce parent n'a pas encore de marqueur, ajoutons-en un
                     var coordinates = feature.geometry.coordinates;
                     var marker = L.marker([coordinates[1], coordinates[0]]);
                     var identifiant = feature.properties.Identifiant;
                     var popupContent = createCarousel(parent, identifiant);
 
-                    // Ajouter une infobulle au marqueur
-                    var tooltip = L.tooltip().setContent(titre); // Utiliser le parent comme contenu de l'infobulle
+                    var tooltip = L.tooltip().setContent(titre);
 
-                    marker.bindTooltip(tooltip); // Lier l'infobulle au marqueur
+                    marker.bindTooltip(tooltip);
 
-                    // Ajouter une fenêtre contextuelle (popup) au marqueur pour le carrousel complet
                     marker.bindPopup(popupContent, {
                         maxWidth: 400
                     });
@@ -408,7 +431,6 @@ function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, 
 
                     markers.addLayer(marker);
 
-                    // Marquer ce parent comme ayant un marqueur ajouté
                     parentMarkers[parent] = true;
                 }
             }

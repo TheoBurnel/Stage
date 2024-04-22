@@ -250,8 +250,8 @@ button:hover {
   border: 1px solid #ccc;
 }
 
-/* Style pour le contrôle de filtrage par technique */
-.technique-filter-control {
+/* Style pour le contrôle de filtrage par matériau */
+.material-filter-control {
   background-color: white;
   opacity: 0.7;
   padding: 10px;
@@ -260,17 +260,32 @@ button:hover {
   font-family: Arial, sans-serif;
 }
 
-.technique-filter-control h4 {
+.material-filter-control h4 {
   margin-top: 0;
   margin-bottom: 5px;
   font-size: 16px;
 }
 
-.technique-filter-control select {
-  width: 100%;
-  padding: 5px;
+
+.type-filter-control input[type="text"] {
   font-size: 14px;
+  padding: 5px;
   border-radius: 3px;
   border: 1px solid #ccc;
+  background-color: #f2f2f2; /* Arrière-plan gris pour la zone de recherche */
 }
 
+.material-filter-control ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.material-filter-control li {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.material-filter-control li:hover {
+  background-color: #f0f0f0;
+}
