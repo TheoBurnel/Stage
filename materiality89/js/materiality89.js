@@ -110,9 +110,9 @@ function showSlidebar(child) {
     if (child.realisation && child.realisation !== '?') {
         slidebarContent += `<p><u>Date de réalisation :</u> ${child.realisation}</p>`;
     }
-    
+
     slidebarContent += `<p><b>Description</b></p>`;
-    
+
     if (child.type_description && child.type_description !== '?') {
         slidebarContent += `<p><u>Type :</u> ${child.type_description}</p>`;
     }
@@ -146,14 +146,14 @@ function showSlidebar(child) {
 
     slidebarContent += `
                 <p><b>Lieu de conservation</b></p>`;
-                
+
     if (child.localisation && child.localisation !== '?') {
         slidebarContent += `<p><u>Localisation :</u> ${child.localisation}</p>`;
     }
     if (child.cote && child.cote !== '?') {
         slidebarContent += `<p><u>Cote / numéro :</u> ${child.cote}</p>`;
     }
-    
+
     slidebarContent += `
             </div>
         </div>`;
@@ -230,6 +230,7 @@ function updateMateriauFilter(value) {
     filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter);
 }
 
+
 // Fonction pour mettre à jour le filtre par couleur
 function updateColorFilter(value) {
     currentColorFilter = value;
@@ -303,6 +304,7 @@ function decrementYear() {
 
 // Définition des matériaux avec leurs clés et libellés
 var matériaux = {
+    '': 'tous les matériaux',
     'blanc de plomb': 'blanc de plomb',
     vermillon: 'vermillon',
     or: 'or',
@@ -340,8 +342,8 @@ controlSelect.onAdd = function (map) {
     // Liste des matériaux à afficher avec une classe pour le filtrage
     div.innerHTML += '<ul id="material-list">';
     for (var key in matériaux) {
-        div.innerHTML += '<li class="material-item" onclick="selectMaterial(\'' + matériaux[key] + '\')">' + matériaux[key] + '</li>';
-    }    
+        div.innerHTML += '<li class="material-item" onclick="selectMaterial(\'' + key + '\')">' + matériaux[key] + '</li>';
+    }
     div.innerHTML += '</ul>';
 
     return div;
