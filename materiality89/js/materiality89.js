@@ -318,14 +318,25 @@ function searchMateriau(searchText) {
     // Sélectionner tous les éléments de matériau
     var materialElements = document.querySelectorAll('.material-item');
 
-    // Parcourir chaque élément et le cacher ou l'afficher en fonction de la correspondance avec le texte saisi
+    // Nettoyer le texte saisi en minuscules
+    var cleanSearchText = searchText.trim().toLowerCase();
+
+    // Parcourir chaque élément et déterminer s'il doit être affiché ou non
     materialElements.forEach(function(element) {
         var materialName = element.textContent.toLowerCase(); // Récupérer le nom du matériau en minuscules
-        var isVisible = materialName.includes(searchText.toLowerCase()); // Vérifier si le texte est présent dans le nom du matériau
+        var isVisible = materialName.includes(cleanSearchText); // Vérifier si le texte est présent dans le nom du matériau
 
         // Afficher ou masquer l'élément en fonction de la visibilité
         element.style.display = isVisible ? 'block' : 'none';
     });
+
+    // Si le champ de recherche est vide après nettoyage
+    if (cleanSearchText === '') {
+        // Cacher tous les éléments matériau
+        materialElements.forEach(function(element) {
+            element.style.display = 'none';
+        });
+    }
 }
 
 // Ajout d'un contrôle de recherche de matériau
@@ -333,7 +344,7 @@ var controlSelect = L.control({ position: 'topright' });
 
 controlSelect.onAdd = function (map) {
     var div = L.DomUtil.create('div', 'type-filter-control');
-    div.innerHTML = '<h4>Filtrer par type de matériau</h4>';
+    div.innerHTML = '<h4>Filtrer par matériau</h4>';
 
     // Champ d'entrée pour rechercher un matériau
     var inputHTML = '<input type="text" placeholder="Rechercher" onkeyup="searchMateriau(this.value)">';
@@ -349,13 +360,35 @@ controlSelect.onAdd = function (map) {
     return div;
 };
 
+// Fonction d'initialisation pour cacher les éléments matériau au chargement de la page
+function initMaterialItems() {
+    var materialElements = document.querySelectorAll('.material-item');
+
+    // Parcourir chaque élément et les cacher
+    materialElements.forEach(function(element) {
+        element.style.display = 'none';
+    });
+}
+
+// Appeler la fonction d'initialisation une fois que le DOM est chargé
+document.addEventListener('DOMContentLoaded', function() {
+    initMaterialItems();
+});
+
 function selectMaterial(material) {
     updateMateriauFilter(material);
+
+    // Sélectionner le champ de recherche
+    var searchInput = document.querySelector('input[type="text"][placeholder="Rechercher"]');
+
+    // Mettre à jour la valeur du champ de recherche avec le matériau sélectionné
+    if (searchInput) {
+        searchInput.value = matériaux[material]; // Utilisez le libellé du matériau correspondant à la clé sélectionnée
+    }
 }
 
 // Ajouter le contrôle de recherche à la carte
 controlSelect.addTo(map);
-
 
 // Définition des couleurs possibles avec leurs clés et libellés
 var colors = {
