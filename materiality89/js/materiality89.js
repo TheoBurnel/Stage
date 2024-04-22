@@ -211,8 +211,8 @@ var yearFilterMin = 400;
 var yearFilterMax = 1860;
 var currentYearFilter = yearFilterMin;
 
-// Variables pour le filtre par type d'œuvre
-var currentTypeFilter = '';
+// Variables pour le filtre par materiau
+var currentMateriauFilter = '';
 
 // Variables pour le filtre par couleur d'œuvre
 var currentColorFilter = '';
@@ -221,19 +221,19 @@ var currentColorFilter = '';
 function updateYearFilter(value) {
     currentYearFilter = parseInt(value);
     document.getElementById('selectedYear').textContent = currentYearFilter;
-    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter);
+    filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter);
 }
 
-// Fonction pour mettre à jour le filtre par type d'œuvre
-function updateTypeFilter(value) {
-    currentTypeFilter = value;
-    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter);
+// Fonction pour mettre à jour le filtre par materiau
+function updateMateriauFilter(value) {
+    currentMateriauFilter = value;
+    filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter);
 }
 
 // Fonction pour mettre à jour le filtre par couleur
 function updateColorFilter(value) {
     currentColorFilter = value;
-    filterMarkersByDateTypeAndColorAndTechnique(currentYearFilter, currentTypeFilter, currentColorFilter);
+    filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter);
 }
 
 
@@ -301,28 +301,27 @@ function decrementYear() {
     }
 }
 
-// Définition des types d'œuvres avec leurs clés et libellés
-var typesOfWork = {
-    manuscrit: 'manuscrit',
-    ['carte géographique']: 'carte géographique',
-    enluminure: 'enluminure',
-    bréviaire: 'bréviaire',
-    dessin: 'dessin',
-    peinture: 'peinture',
-    estampe: 'estampe'
+// Définition des matériaux avec leurs clés et libellés
+var matériaux = {
+    ['blanc de plomb']: 'blanc de plomb',
+    vermillon: 'vermillon',
+    or: 'or',
+    ['lapis-lazuli']: 'lapis-lazuli',
+    indigo: 'indigo',
+    ['oxyde de plomb']: 'oxyde de plomb'
 };
 
-// Ajout d'un contrôle de sélection pour filtrer par type d'œuvre
+// Ajout d'un contrôle de sélection pour filtrer par matériau
 var controlSelect = L.control({ position: 'topright' });
 
 controlSelect.onAdd = function (map) {
     var div = L.DomUtil.create('div', 'type-filter-control');
-    div.innerHTML = '<h4>Filtrer par type d\'œuvre</h4>';
+    div.innerHTML = '<h4>Filtrer par type de matériau</h4>';
 
-    var selectHTML = '<select onchange="updateTypeFilter(this.value)">';
+    var selectHTML = '<select onchange="updateMateriauFilter(this.value)">';
     selectHTML += '<option value="">Tous les types</option>';
-    for (var key in typesOfWork) {
-        selectHTML += '<option value="' + key + '">' + typesOfWork[key] + '</option>';
+    for (var key in matériaux) {
+        selectHTML += '<option value="' + key + '">' + matériaux[key] + '</option>';
     }
     selectHTML += '</select>';
 
@@ -367,7 +366,7 @@ colorFilterControl.addTo(map);
 
 ///////////////////////
 // FONCTION POUR RÉCUPÉRER LES DONNÉES
-function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, colorFilter) {
+function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, colorFilter) {
     markers.clearLayers();
 
     var parentMarkers = {}; // Dictionnaire pour suivre les parents pour lesquels nous avons ajouté un marqueur
@@ -379,11 +378,11 @@ function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, col
         var parent = feature.properties.Parent;
         var titre = feature.properties.Titre;
 
-        // Filtrer sur la base de la date, du type d'œuvre, de la couleur et de la technique
+        // Filtrer sur la base de la date, du type d'œuvre, de la couleur et du matériau
         if (isParent(feature.properties.Identifiant)) {
             if (
                 dateYear <= yearFilter &&
-                (typeFilter === '' || type.includes(typeFilter)) &&
+                (materiauFilter === '' || feature.properties.Materiaux.toLowerCase().includes(materiauFilter.toLowerCase())) &&
                 (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase()))
             ) {
                 if (!(parent in parentMarkers)) {
@@ -398,23 +397,23 @@ function filterMarkersByDateTypeAndColorAndTechnique(yearFilter, typeFilter, col
 
                     marker.bindTooltip(tooltip); // Lier l'infobulle au marqueur
 
-                        // Ajouter une fenêtre contextuelle (popup) au marqueur pour le carrousel complet
-                        marker.bindPopup(popupContent, {
-                            maxWidth: 400
-                        });
+                    // Ajouter une fenêtre contextuelle (popup) au marqueur pour le carrousel complet
+                    marker.bindPopup(popupContent, {
+                        maxWidth: 400
+                    });
 
-                        marker.on('popupclose', function () {
-                            hideSlidebar();
-                        });
+                    marker.on('popupclose', function () {
+                        hideSlidebar();
+                    });
 
-                        markers.addLayer(marker);
+                    markers.addLayer(marker);
 
-                        // Marquer ce parent comme ayant un marqueur ajouté
-                        parentMarkers[parent] = true;
-                    }
+                    // Marquer ce parent comme ayant un marqueur ajouté
+                    parentMarkers[parent] = true;
+                }
             }
-            }
-        });
+        }
+    });
 
     map.addLayer(markers);
 }
