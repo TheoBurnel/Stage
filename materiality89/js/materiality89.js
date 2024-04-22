@@ -304,13 +304,17 @@ function decrementYear() {
 
 // Définition des matériaux avec leurs clés et libellés
 var matériaux = {
-    '': 'tous les matériaux',
     'blanc de plomb': 'blanc de plomb',
     vermillon: 'vermillon',
     or: 'or',
     'lapis-lazuli': 'lapis-lazuli',
     indigo: 'indigo',
     'oxyde de plomb': 'oxyde de plomb'
+};
+
+// Texte constant pour afficher "tous les matériaux"
+var nettoyage = {
+    '': 'Nettoyer le filtre'
 };
 
 // Fonction pour mettre à jour l'affichage en fonction du texte saisi
@@ -343,7 +347,7 @@ function searchMateriau(searchText) {
 var controlSelect = L.control({ position: 'topright' });
 
 controlSelect.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'type-filter-control');
+    var div = L.DomUtil.create('div', 'material-filter-control h4');
     div.innerHTML = '<h4>Filtrer par matériau</h4>';
 
     // Champ d'entrée pour rechercher un matériau
@@ -352,10 +356,15 @@ controlSelect.onAdd = function (map) {
 
     // Liste des matériaux à afficher avec une classe pour le filtrage
     div.innerHTML += '<ul id="material-list">';
+    // Ajouter les autres matériaux à partir de votre objet 'matériaux'
     for (var key in matériaux) {
         div.innerHTML += '<li class="material-item" onclick="selectMaterial(\'' + key + '\')">' + matériaux[key] + '</li>';
     }
     div.innerHTML += '</ul>';
+    
+    // Ajouter l'élément pour "tous les matériaux" 
+    div.innerHTML += '<p class="all-materials-item" onclick="selectMaterial(\'\')">' + nettoyage[''] + '</p>';
+
 
     return div;
 };
@@ -375,15 +384,14 @@ document.addEventListener('DOMContentLoaded', function() {
     initMaterialItems();
 });
 
+// Fonction appelée lors de la sélection d'un matériau dans la liste
 function selectMaterial(material) {
     updateMateriauFilter(material);
-
     // Sélectionner le champ de recherche
     var searchInput = document.querySelector('input[type="text"][placeholder="Rechercher"]');
-
     // Mettre à jour la valeur du champ de recherche avec le matériau sélectionné
     if (searchInput) {
-        searchInput.value = matériaux[material]; // Utilisez le libellé du matériau correspondant à la clé sélectionnée
+        searchInput.value = matériaux[material] || nettoyage[material]; // Utiliser le libellé correspondant à la clé sélectionnée
     }
 }
 
