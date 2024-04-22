@@ -237,7 +237,6 @@ function updateColorFilter(value) {
     filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter);
 }
 
-
 // Ajout du contrôle de sélection avec jauge pour filtrer par année de réalisation
 var controlSlider = L.control({ position: 'topright' });
 
@@ -302,15 +301,31 @@ function decrementYear() {
     }
 }
 
-// Définition des matériaux avec leurs clés et libellés
-var matériaux = {
-    'blanc de plomb': 'blanc de plomb',
-    vermillon: 'vermillon',
-    or: 'or',
-    'lapis-lazuli': 'lapis-lazuli',
-    indigo: 'indigo',
-    'oxyde de plomb': 'oxyde de plomb'
-};
+
+///////////////
+//MATERIAUX
+// Utiliser un ensemble pour stocker les valeurs uniques de Materiaux
+var uniqueMaterials = new Set();
+
+// Parcourir les données geojson_RAMA.features pour collecter les valeurs uniques
+geojson_RAMA.features.forEach(function(feature) {
+    var materiaux = feature.properties.Materiaux || '?'; // Valeur par défaut si Materiaux est vide
+    
+    // Séparer les matériaux si la valeur contient des caractères spécifiques comme '-'
+    var materialList = materiaux.split(' – ').join(',').split(','); // Diviser sur ' – ' et ','
+    
+    // Ajouter chaque matériau à l'ensemble uniqueMaterials
+    materialList.forEach(function(material) {
+        uniqueMaterials.add(material.trim()); // Ajouter le matériau sans espaces inutiles
+    });
+});
+
+// Créer le tableau matériaux à partir de l'ensemble uniqueMaterials
+var matériaux = {};
+uniqueMaterials.forEach(function(material) {
+    matériaux[material] = material; // Utiliser le matériau comme clé et valeur dans l'objet matériaux
+});
+
 
 // Texte constant pour afficher "tous les matériaux"
 var nettoyage = {
@@ -361,7 +376,7 @@ controlSelect.onAdd = function (map) {
         div.innerHTML += '<li class="material-item" onclick="selectMaterial(\'' + key + '\')">' + matériaux[key] + '</li>';
     }
     div.innerHTML += '</ul>';
-    
+
     // Ajouter l'élément pour "tous les matériaux" 
     div.innerHTML += '<p class="all-materials-item" onclick="selectMaterial(\'\')">' + nettoyage[''] + '</p>';
 
@@ -384,15 +399,43 @@ document.addEventListener('DOMContentLoaded', function() {
     initMaterialItems();
 });
 
+// Fonction pour réinitialiser le filtre de recherche de matériau
+function resetMaterialFilter() {
+    var materialElements = document.querySelectorAll('.material-item');
+
+    // Cacher tous les éléments matériau
+    materialElements.forEach(function(element) {
+        element.style.display = 'none';
+    });
+}
+
 // Fonction appelée lors de la sélection d'un matériau dans la liste
 function selectMaterial(material) {
     updateMateriauFilter(material);
+    // Réinitialiser le filtre après la sélection d'un matériau
+    resetMaterialFilter();
+
     // Sélectionner le champ de recherche
     var searchInput = document.querySelector('input[type="text"][placeholder="Rechercher"]');
     // Mettre à jour la valeur du champ de recherche avec le matériau sélectionné
     if (searchInput) {
-        searchInput.value = matériaux[material] || nettoyage[material]; // Utiliser le libellé correspondant à la clé sélectionnée
+        searchInput.value = matériaux[material] || ""; // Utiliser le libellé correspondant à la clé sélectionnée
     }
+}
+
+// Fonction pour nettoyer le filtre de recherche de matériau
+function clearMaterialFilter() {
+    // Réinitialiser le champ de recherche
+    var searchInput = document.querySelector('input[type="text"][placeholder="Rechercher"]');
+    if (searchInput) {
+        searchInput.value = ''; // Effacer le texte du champ de recherche
+    }
+
+    // Réinitialiser et afficher tous les éléments matériau
+    var materialElements = document.querySelectorAll('.material-item');
+    materialElements.forEach(function(element) {
+        element.style.display = 'block'; // Afficher tous les éléments matériau
+    });
 }
 
 // Ajouter le contrôle de recherche à la carte
