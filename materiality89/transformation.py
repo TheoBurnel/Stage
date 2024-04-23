@@ -66,7 +66,7 @@ def csv_to_json(input_csv_path, output_json_path):
             
             # Parse et échapper les valeurs de chaînes de caractères
             titre = escapeApostrophes(parse_value(row["dcterms:title"]))
-            parent = escapeApostrophes(parse_value(row["crm:P106i_forms_part_of"]))
+            parent = escapeApostrophes(parse_value(row["crm:P106_forms_part_of"]))
             
             # Vérifier si le parent existe déjà dans le dictionnaire
             if parent in parent_suffix_count:
@@ -99,7 +99,7 @@ def csv_to_json(input_csv_path, output_json_path):
             ville = escapeApostrophes(parse_value(row["schema:locationCreated"]))
             realisation = escapeApostrophes(parse_value(row["crm:P4_has_time-span"]))
             date_filtre = escapeApostrophes(pour_filtre(row["crm:P4_has_time-span"]))
-            identifiant = escapeApostrophes(parse_value(row["dcterms:identifier"]))
+            identifiant = escapeApostrophes(parse_value(row["schema:identifier"]))
             type_description = escapeApostrophes(parse_value(row['crm:P2_has_type']))
             caracteristique = escapeApostrophes(parse_value(row["dcterms:type"]))
             technique = escapeApostrophes(parse_value(row["schema:artMedium"]))

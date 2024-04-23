@@ -65,7 +65,7 @@ def keep_most_precise(group):
     return group[keep_mask]
 
 # Appliquer la fonction de filtrage et concaténer les résultats
-filtered_data = grouped.apply(keep_most_precise).reset_index(drop=True)
+filtered_data = grouped.apply(keep_most_precise, include_groups=False).reset_index(drop=True)
 
 # Identifier les lignes non retenues par le filtrage
 not_kept_indices = ~filtered_data.index

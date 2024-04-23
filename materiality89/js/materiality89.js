@@ -479,7 +479,7 @@ function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, 
     markers.clearLayers();
 
     var parentMarkers = {};
-
+    
     geojson_RAMA.features.forEach(function (feature) {
         var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
         var type = feature.properties.Type;
@@ -490,38 +490,38 @@ function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, 
         // Debugging: Log information for each feature
         console.log("Feature:", feature.properties);
 
-        // Filter based on date, material, and color
-        if (isParent(feature.properties.Identifiant)) {
-            if (
-                dateYear <= yearFilter &&
-                (materiauFilter === '' || feature.properties.Materiaux.toLowerCase().includes(materiauFilter.toLowerCase())) &&
-                (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase()))
-            ) {
-                if (!(parent in parentMarkers)) {
-                    var coordinates = feature.geometry.coordinates;
-                    var marker = L.marker([coordinates[1], coordinates[0]]);
-                    var identifiant = feature.properties.Identifiant;
-                    var popupContent = createCarousel(parent, identifiant);
+            // Filter based on date, material, and color
+            if (isParent(feature.properties.Identifiant)) {
+                                if (
+                    dateYear <= yearFilter &&
+                    (materiauFilter === '' || feature.properties.Materiaux.toLowerCase().includes(materiauFilter.toLowerCase())) &&
+                    (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase()))
+                ) {
+                    if (!(parent in parentMarkers)) {
+                        var coordinates = feature.geometry.coordinates;
+                        var marker = L.marker([coordinates[1], coordinates[0]]);
+                        var identifiant = feature.properties.Identifiant;
+                        var popupContent = createCarousel(parent, identifiant);
 
-                    var tooltip = L.tooltip().setContent(titre);
+                        var tooltip = L.tooltip().setContent(titre);
 
-                    marker.bindTooltip(tooltip);
+                        marker.bindTooltip(tooltip);
 
-                    marker.bindPopup(popupContent, {
-                        maxWidth: 400
-                    });
+                        marker.bindPopup(popupContent, {
+                            maxWidth: 400
+                        });
 
-                    marker.on('popupclose', function () {
-                        hideSlidebar();
-                    });
+                        marker.on('popupclose', function () {
+                            hideSlidebar();
+                        });
 
-                    markers.addLayer(marker);
+                        markers.addLayer(marker);
 
-                    parentMarkers[parent] = true;
+                        parentMarkers[parent] = true;
+                    }
                 }
             }
-        }
-    });
+        });
 
     map.addLayer(markers);
 }
