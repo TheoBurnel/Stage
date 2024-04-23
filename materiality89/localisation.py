@@ -1,14 +1,11 @@
 import pandas as pd
-import numpy as np  # Ajouter cette ligne pour importer numpy
+import numpy as np
 
 # Chemin vers le fichier CSV initial
 csv_path = "donnees/materiality89.csv"
 
 # Charger les données en ne sélectionnant que les colonnes pertinentes
 data = pd.read_csv(csv_path)
-
-# Nettoyage de la colonne 'dcterms:identifier' pour supprimer les parties après '§'
-data['dcterms:identifier'] = data['dcterms:identifier'].apply(lambda x: x.split('§')[0] if '§' in x else x)
 
 # Filtrage des lignes contenant des coordonnées multiples
 filtered_data = data[data['schema:geographicArea'].fillna('').str.contains('§')]
@@ -23,7 +20,7 @@ for _, row in filtered_data.iterrows():
         extended_data = pd.concat([extended_data, pd.DataFrame([new_row])], ignore_index=True)
 
 # Suppression des doublons
-extended_data.drop_duplicates(subset=['dcterms:identifier', 'schema:geographicArea'], inplace=True)
+extended_data.drop_duplicates(subset=['schema:identifier', 'schema:geographicArea'], inplace=True)
 
 # Extraction des latitudes et longitudes
 extended_data[['latitude', 'longitude']] = extended_data['schema:geographicArea'].str.split(',', expand=True)
@@ -32,8 +29,8 @@ extended_data[['latitude', 'longitude']] = extended_data['schema:geographicArea'
 extended_data['latitude'] = pd.to_numeric(extended_data['latitude'], errors='coerce')
 extended_data['longitude'] = pd.to_numeric(extended_data['longitude'], errors='coerce')
 
-# Grouper les données par 'dcterms:identifier' pour effectuer les comparaisons
-grouped = extended_data.groupby('dcterms:identifier')
+# Grouper les données par 'schema:identifier' pour effectuer les comparaisons
+grouped = extended_data.groupby('schema:identifier')
 
 # Fonction pour déterminer quelle ligne conserver selon les critères spécifiés
 def keep_most_precise(group):
