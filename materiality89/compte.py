@@ -2,13 +2,13 @@ import pandas as pd
 from collections import Counter
 
 # Chemin vers votre fichier CSV
-chemin_fichier_csv = "donnees/materiality89.csv"
+chemin_fichier_csv = "donnees/bases.csv"
 
 # Charger le fichier CSV dans un DataFrame pandas
 df = pd.read_csv(chemin_fichier_csv)
 
 # Vérifier le nom exact de la colonne contenant les données d'artMedium
-colonne_art_medium = 'schema:material'
+colonne_art_medium = 'dcterms:references'
 
 # Initialiser un compteur pour les noms d'artMedium
 compteur_noms = Counter()

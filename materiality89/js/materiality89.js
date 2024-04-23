@@ -41,7 +41,7 @@ function getChildrenByParent(parent) {
                 localisation: feature.properties.Localisation || '?',
                 cote: feature.properties.Cote || '?',
                 date_filtre: feature.properties.Date_filtre || '?',
-                projet: feature.properties.Projet 
+                projet: feature.properties.Projet
             });
         }
     });
@@ -221,24 +221,32 @@ var currentMateriauFilter = '';
 // Variables pour le filtre par couleur d'œuvre
 var currentColorFilter = '';
 
+// Variables pour le filtre par projet
+var currentBaseFilter = '';
+
 // Fonction pour mettre à jour le filtre par année de réalisation
 function updateYearFilter(value) {
     currentYearFilter = parseInt(value);
     document.getElementById('selectedYear').textContent = currentYearFilter;
-    filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter);
+    filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter, currentBaseFilter);
 }
 
 // Fonction pour mettre à jour le filtre par materiau
 function updateMateriauFilter(value) {
     currentMateriauFilter = value;
-    filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter);
+    filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter, currentBaseFilter);
 }
-
 
 // Fonction pour mettre à jour le filtre par couleur
 function updateColorFilter(value) {
     currentColorFilter = value;
-    filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter);
+    filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter, currentBaseFilter);
+}
+
+// Fonction pour mettre à jour le filtre par projet
+function updateBaseFilter(value) {
+    currentBaseFilter = value;
+    filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter, currentBaseFilter);
 }
 
 // Ajout du contrôle de sélection avec jauge pour filtrer par année de réalisation
@@ -312,21 +320,21 @@ function decrementYear() {
 var uniqueMaterials = new Set();
 
 // Parcourir les données geojson_RAMA.features pour collecter les valeurs uniques
-geojson_RAMA.features.forEach(function(feature) {
+geojson_RAMA.features.forEach(function (feature) {
     var materiaux = feature.properties.Materiaux || '?'; // Valeur par défaut si Materiaux est vide
-    
+
     // Séparer les matériaux si la valeur contient des caractères spécifiques comme '-'
     var materialList = materiaux.split(' – ').join(',').split(','); // Diviser sur ' – ' et ','
-    
+
     // Ajouter chaque matériau à l'ensemble uniqueMaterials
-    materialList.forEach(function(material) {
+    materialList.forEach(function (material) {
         uniqueMaterials.add(material.trim()); // Ajouter le matériau sans espaces inutiles
     });
 });
 
 // Créer le tableau matériaux à partir de l'ensemble uniqueMaterials
 var matériaux = {};
-uniqueMaterials.forEach(function(material) {
+uniqueMaterials.forEach(function (material) {
     matériaux[material] = material; // Utiliser le matériau comme clé et valeur dans l'objet matériaux
 });
 
@@ -345,7 +353,7 @@ function searchMateriau(searchText) {
     var cleanSearchText = searchText.trim().toLowerCase();
 
     // Parcourir chaque élément et déterminer s'il doit être affiché ou non
-    materialElements.forEach(function(element) {
+    materialElements.forEach(function (element) {
         var materialName = element.textContent.toLowerCase(); // Récupérer le nom du matériau en minuscules
         var isVisible = materialName.includes(cleanSearchText); // Vérifier si le texte est présent dans le nom du matériau
 
@@ -356,7 +364,7 @@ function searchMateriau(searchText) {
     // Si le champ de recherche est vide après nettoyage
     if (cleanSearchText === '') {
         // Cacher tous les éléments matériau
-        materialElements.forEach(function(element) {
+        materialElements.forEach(function (element) {
             element.style.display = 'none';
         });
     }
@@ -393,13 +401,13 @@ function initMaterialItems() {
     var materialElements = document.querySelectorAll('.material-item');
 
     // Parcourir chaque élément et les cacher
-    materialElements.forEach(function(element) {
+    materialElements.forEach(function (element) {
         element.style.display = 'none';
     });
 }
 
 // Appeler la fonction d'initialisation une fois que le DOM est chargé
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initMaterialItems();
 });
 
@@ -408,7 +416,7 @@ function resetMaterialFilter() {
     var materialElements = document.querySelectorAll('.material-item');
 
     // Cacher tous les éléments matériau
-    materialElements.forEach(function(element) {
+    materialElements.forEach(function (element) {
         element.style.display = 'none';
     });
 }
@@ -437,13 +445,16 @@ function clearMaterialFilter() {
 
     // Réinitialiser et afficher tous les éléments matériau
     var materialElements = document.querySelectorAll('.material-item');
-    materialElements.forEach(function(element) {
+    materialElements.forEach(function (element) {
         element.style.display = 'block'; // Afficher tous les éléments matériau
     });
 }
 
 // Ajouter le contrôle de recherche à la carte
 controlSelect.addTo(map);
+
+///////////////
+//COULEURS
 
 // Définition des couleurs possibles avec leurs clés et libellés
 var colors = {
@@ -477,55 +488,91 @@ colorFilterControl.onAdd = function (map) {
 
 colorFilterControl.addTo(map);
 
+///////////////
+//BASES
+
+// Définition des bases
+var bases = {
+    'La fabrique de l&#39;art. Couleurs et matériaux de l&#39;enluminuree': 'Couleurs et matériaux de l\'enluminure',
+    'La fabrique matérielle du visuel. Panneaux peints en Méditerranée XIIIe-XVIe siècles': 'Panneaux peints en Méditerranée XIIIe-XVIe siècles'
+};
+
+// Ajout d'un contrôle de sélection pour filtrer par couleur
+var baseFilterControl = L.control({ position: 'topright' });
+
+baseFilterControl.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'base-filter-control');
+    div.innerHTML = '<h4>Filtrer par projet</h4>';
+
+    var selectHTML = '<select onchange="updateBaseFilter(this.value)">';
+    selectHTML += '<option value="">Tous les projets</option>';
+    for (var key in bases) {
+        selectHTML += '<option value="' + key + '">' + bases[key] + '</option>';
+    }
+    selectHTML += '</select>';
+
+    div.innerHTML += selectHTML;
+
+    return div;
+};
+
+baseFilterControl.addTo(map);
+
+
 ///////////////////////
 // FONCTION POUR RÉCUPÉRER LES DONNÉES
-function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, colorFilter) {
+function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, colorFilter, baseFilter) {
     markers.clearLayers();
 
     var parentMarkers = {};
-    
+
     geojson_RAMA.features.forEach(function (feature) {
         var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
         var type = feature.properties.Type;
         var couleur = feature.properties.Couleur;
         var parent = feature.properties.Parent;
+        var projet = feature.properties.Projet;
         var titre = feature.properties.Titre;
 
         // Debugging: Log information for each feature
         console.log("Feature:", feature.properties);
 
-            // Filter based on date, material, and color
-            if (isParent(feature.properties.Identifiant)) {
-                                if (
-                    dateYear <= yearFilter &&
-                    (materiauFilter === '' || feature.properties.Materiaux.toLowerCase().includes(materiauFilter.toLowerCase())) &&
-                    (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase()))
-                ) {
-                    if (!(parent in parentMarkers)) {
-                        var coordinates = feature.geometry.coordinates;
-                        var marker = L.marker([coordinates[1], coordinates[0]]);
-                        var identifiant = feature.properties.Identifiant;
-                        var popupContent = createCarousel(parent, identifiant);
+        // Nettoyer la valeur du filtre de base en supprimant les apostrophes
+        var cleanedBaseFilter = baseFilter.toLowerCase().replace(/'/g, '');
 
-                        var tooltip = L.tooltip().setContent(titre);
+        // Filter based on date, material, color, and base
+        if (isParent(feature.properties.Identifiant)) {
+            if (
+                dateYear <= yearFilter &&
+                (materiauFilter === '' || feature.properties.Materiaux.toLowerCase().includes(materiauFilter.toLowerCase())) &&
+                (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase())) &&
+                (cleanedBaseFilter === '' || projet.toLowerCase().includes(cleanedBaseFilter))
+            ) {
+                if (!(parent in parentMarkers)) {
+                    var coordinates = feature.geometry.coordinates;
+                    var marker = L.marker([coordinates[1], coordinates[0]]);
+                    var identifiant = feature.properties.Identifiant;
+                    var popupContent = createCarousel(parent, identifiant);
 
-                        marker.bindTooltip(tooltip);
+                    var tooltip = L.tooltip().setContent(titre);
 
-                        marker.bindPopup(popupContent, {
-                            maxWidth: 400
-                        });
+                    marker.bindTooltip(tooltip);
 
-                        marker.on('popupclose', function () {
-                            hideSlidebar();
-                        });
+                    marker.bindPopup(popupContent, {
+                        maxWidth: 400
+                    });
 
-                        markers.addLayer(marker);
+                    marker.on('popupclose', function () {
+                        hideSlidebar();
+                    });
 
-                        parentMarkers[parent] = true;
-                    }
+                    markers.addLayer(marker);
+
+                    parentMarkers[parent] = true;
                 }
             }
-        });
+        }
+    });
 
     map.addLayer(markers);
 }
