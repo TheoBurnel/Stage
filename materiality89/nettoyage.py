@@ -12,7 +12,7 @@ def nettoyer_identifiant(identifiant):
 
 # Chemin vers votre fichier CSV d'entrée et de sortie
 fichier_entree = 'donnees/materiality89.csv'
-fichier_sortie = 'donnees/materiality89_net.csv'
+fichier_sortie = 'donnees/materiality_net.csv'
 
 # Liste pour stocker les lignes modifiées
 lignes_modifiees = []

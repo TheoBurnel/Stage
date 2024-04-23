@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 # Chemin vers le fichier CSV initial
-csv_path = "donnees/materiality89_net.csv"
+csv_path = "donnees/materiality_net.csv"
 
 # Charger les données en ne sélectionnant que les colonnes pertinentes
 data = pd.read_csv(csv_path)
@@ -12,6 +12,7 @@ filtered_data = data[data['schema:geographicArea'].fillna('').str.contains('§')
 
 # Création du DataFrame étendu avec des coordonnées séparées
 extended_data = pd.DataFrame()
+
 for _, row in filtered_data.iterrows():
     coords = row['schema:geographicArea'].split('§')
     for coord in coords:
@@ -38,12 +39,8 @@ def keep_most_precise(group):
         return group  # Si une seule ligne, la conserver
     
     # Calculer les différences entre les latitudes et les longitudes
-    latitudes = group['latitude']
-    longitudes = group['longitude']
-    
-    # Comparer les différences avec le seuil (3 degrés)
-    lat_diffs = np.abs(latitudes.diff())
-    lon_diffs = np.abs(longitudes.diff())
+    lat_diffs = np.abs(group['latitude'].diff())
+    lon_diffs = np.abs(group['longitude'].diff())
     
     # Préparer un masque pour garder la ligne la plus précise
     keep_mask = np.ones(len(group), dtype=bool)
@@ -51,10 +48,10 @@ def keep_most_precise(group):
     for i in range(1, len(group)):
         if lat_diffs.iloc[i] <= 3 and lon_diffs.iloc[i] <= 3:
             # Comparer les précisions des latitudes et longitudes
-            curr_lat_precision = len(str(latitudes.iloc[i]).split('.')[-1])
-            prev_lat_precision = len(str(latitudes.iloc[i-1]).split('.')[-1])
-            curr_lon_precision = len(str(longitudes.iloc[i]).split('.')[-1])
-            prev_lon_precision = len(str(longitudes.iloc[i-1]).split('.')[-1])
+            curr_lat_precision = len(str(group['latitude'].iloc[i]).split('.')[-1])
+            prev_lat_precision = len(str(group['latitude'].iloc[i-1]).split('.')[-1])
+            curr_lon_precision = len(str(group['longitude'].iloc[i]).split('.')[-1])
+            prev_lon_precision = len(str(group['longitude'].iloc[i-1]).split('.')[-1])
             
             if (curr_lat_precision < prev_lat_precision) or (curr_lon_precision < prev_lon_precision):
                 keep_mask[i] = False  # Supprimer la ligne actuelle si moins précise
@@ -65,10 +62,10 @@ def keep_most_precise(group):
     return group[keep_mask]
 
 # Appliquer la fonction de filtrage et concaténer les résultats
-filtered_data = grouped.apply(keep_most_precise, include_groups=False).reset_index(drop=True)
+filtered_data = grouped.apply(keep_most_precise).reset_index(drop=True)
 
 # Identifier les lignes non retenues par le filtrage
-not_kept_indices = ~filtered_data.index
+not_kept_indices = filtered_data.index.isin(filtered_data['dcterms:identifier'].unique())
 
 # Extraire les lignes non retenues du DataFrame original
 not_kept_data = data[~data['schema:geographicArea'].fillna('').str.contains('§')]
