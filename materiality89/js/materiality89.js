@@ -40,7 +40,8 @@ function getChildrenByParent(parent) {
                 source: feature.properties.Source || '?',
                 localisation: feature.properties.Localisation || '?',
                 cote: feature.properties.Cote || '?',
-                date_filtre: feature.properties.Date_filtre || '?'
+                date_filtre: feature.properties.Date_filtre || '?',
+                projet: feature.properties.Projet 
             });
         }
     });
@@ -152,6 +153,9 @@ function showSlidebar(child) {
     }
     if (child.cote && child.cote !== '?') {
         slidebarContent += `<p><u>Cote / numéro :</u> ${child.cote}</p>`;
+    }
+    if (child.cote && child.cote !== '?') {
+        slidebarContent += `<p><u>Projet :</u> ${child.projet}</p>`;
     }
 
     slidebarContent += `

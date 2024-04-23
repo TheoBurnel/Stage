@@ -113,6 +113,7 @@ def csv_to_json(input_csv_path, output_json_path):
             source = escapeApostrophes(parse_value(row['dcterms:isReferencedBy']))
             localisation = escapeApostrophes(parse_value(row['crm:P54_has_current_permanent_location']))
             cote = escapeApostrophes(parse_value(row['crm:P1_is_identified_by']))
+            projet = escapeApostrophes(parse_value(row['dcterms:references']))
 
             # Créer la structure JSON (Feature) pour chaque ligne
             feature = {
@@ -141,7 +142,8 @@ def csv_to_json(input_csv_path, output_json_path):
                     "Source": source,
                     "Localisation": localisation,
                     "Cote": cote,
-                    "Date_filtre": date_filtre
+                    "Date_filtre": date_filtre,
+                    "Projet": projet
                 },
                 "type": "Feature"
             }
@@ -160,7 +162,7 @@ def csv_to_json(input_csv_path, output_json_path):
         json.dump({"type": "FeatureCollection", "features": data}, json_file, indent=4, ensure_ascii=False)
 
 # Spécifiez le chemin du fichier CSV en entrée et du fichier JSON en sortie
-csv_input_path = 'donnees/localisation.csv'
+csv_input_path = 'donnees/bases.csv'
 json_output_path = 'data/materiality89.js'
 
 # Appeler la fonction pour convertir le fichier CSV en JSON
