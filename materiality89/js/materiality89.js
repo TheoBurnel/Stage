@@ -23,6 +23,7 @@ function getChildrenByParent(parent) {
             children.push({
                 titre: feature.properties.Titre || '?',
                 name: feature.properties.Identifiant || '?',
+                image: feature.properties.Image || '?',
                 type: feature.properties.Type || '?',
                 attribution: feature.properties.Attribution || '?',
                 lieu: feature.properties.Lieu_de_creation || '?',
@@ -66,9 +67,15 @@ function createCarousel(parent, identifiant) {
         }
         carouselContent += "<h3>" + child.titre + "</h3>";
         carouselContent += "<p>Identifiant : " + child.name + "</p>";
-                if (child.caracteristique && child.caracteristique !== '?') {
+
+        if (child.image && child.image !== '?' ) {
+            carouselContent += "<img src='" + child.image + "' />";
+        }
+        
+        if (child.caracteristique && child.caracteristique !== '?') {
             carouselContent += "<p><u>Caractéristique</u>: " + child.caracteristique + "</p>";
         }
+    
         if (child.technique && child.technique !== '?') {
             carouselContent += "<p><u>Technique(s)</u>: " + child.technique + "</p>";
         }
@@ -112,6 +119,7 @@ function showSlidebar(child) {
     <div class="slidebar-body">
         <p><b>Identification</b></p>
         <p><u>Identifiant :</u> ${child.name || '?'}</p>`;
+
 
     if (child.type && child.type !== '?') {
         slidebarContent += `<p><u>Type d'œuvre :</u> ${child.type}</p>`;

@@ -100,6 +100,7 @@ def csv_to_json(input_csv_path, output_json_path):
             realisation = escapeApostrophes(parse_value(row["crm:P4_has_time-span"]))
             date_filtre = escapeApostrophes(pour_filtre(row["crm:P4_has_time-span"]))
             identifiant = escapeApostrophes(parse_value(row["dcterms:identifier"]))
+            image = escapeApostrophes(parse_value(row["dcterms:image"]))
             type_description = escapeApostrophes(parse_value(row['crm:P2_has_type']))
             caracteristique = escapeApostrophes(parse_value(row["dcterms:type"]))
             technique = escapeApostrophes(parse_value(row["schema:artMedium"]))
@@ -129,6 +130,7 @@ def csv_to_json(input_csv_path, output_json_path):
                     "Lieu_de_creation": ville,
                     "Realisation": realisation,
                     "Identifiant": identifiant,
+                    "Image": image,
                     "Type_description": type_description,
                     "Caracteristique": caracteristique,
                     "Technique": technique,
@@ -162,7 +164,7 @@ def csv_to_json(input_csv_path, output_json_path):
         json.dump({"type": "FeatureCollection", "features": data}, json_file, indent=4, ensure_ascii=False)
 
 # Spécifiez le chemin du fichier CSV en entrée et du fichier JSON en sortie
-csv_input_path = 'donnees/bases.csv'
+csv_input_path = 'donnees/bases_images_merged.csv'
 json_output_path = 'data/materiality89.js'
 
 # Appeler la fonction pour convertir le fichier CSV en JSON

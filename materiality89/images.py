@@ -35,5 +35,8 @@ df_entree_2 = process_file(chemin_fichier_entree_2)
 # Concaténer les DataFrames résultants
 df_combine = pd.concat([df_entree_1, df_entree_2], ignore_index=True)
 
+# Supprimer les doublons dans la colonne 'dcterms:identifier'
+df_combine = df_combine.drop_duplicates(subset='dcterms:identifier')
+
 # Enregistrer le fichier CSV filtré combiné
 df_combine.to_csv(chemin_fichier_sortie, index=False)
