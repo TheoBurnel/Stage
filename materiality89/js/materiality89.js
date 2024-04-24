@@ -209,6 +209,55 @@ function nextSlide(button) {
 
 ////////////////////////
 // FILTRES
+///////////////
+//BASES
+// Ajout d'un contrôle de sélection avec des boutons radio pour filtrer par projet
+var baseFilterControl = L.control({ position: 'topright' });
+
+baseFilterControl.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'base-filter-control');
+    div.innerHTML = '<h4>Filtrer par projet</h4>';
+
+    // Définition des bases avec leurs libellés
+    var bases = {
+        '': 'Tous les projets',
+        'Couleurs et matériaux': 'Couleurs et matériaux de l\'enluminure',
+        'Panneaux peints': 'Panneaux peints en Méditerranée'
+    };
+
+    // Générer des boutons radio à partir des bases définies
+    for (var key in bases) {
+        var label = bases[key];
+
+        // Créer un bouton radio avec un événement onchange pour mettre à jour le filtre
+        var radioButton = '<input type="radio" id="' + key + '" name="base-filter" value="' + key + '" onchange="updateBaseFilter(this.value)"> ';
+        radioButton += '<label for="' + key + '">' + label + '</label><br>';
+
+        div.innerHTML += radioButton;
+    }
+
+    // Sélectionner le bouton radio "Tous les projets" par défaut
+    var defaultRadioButton = div.querySelector('input[value=""]');
+    if (defaultRadioButton) {
+        defaultRadioButton.checked = true;
+    }
+
+    return div;
+};
+
+// Fonction pour mettre à jour le filtre par projet en fonction de la valeur sélectionnée
+function updateBaseFilter(value) {
+    currentBaseFilter = value;
+    filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter, currentBaseFilter);
+}
+
+// Ajouter le contrôle de sélection avec des boutons radio à la carte
+baseFilterControl.addTo(map);
+
+
+
+///////////////
+//DATE
 // Variables pour les filtres par date
 var yearFilterMin = 400;
 var yearFilterMax = 1860;
@@ -486,35 +535,6 @@ colorFilterControl.onAdd = function (map) {
 };
 
 colorFilterControl.addTo(map);
-
-///////////////
-//BASES
-// Définition des bases
-var bases = {
-    'Couleurs et matériaux': 'Couleurs et matériaux de l\'enluminure',
-    'La fabrique matérielle du visuel. Panneaux peints en Méditerranée XIIIe-XVIe siècles': 'Panneaux peints en Méditerranée XIIIe-XVIe siècles'
-};
-
-// Ajout d'un contrôle de sélection pour filtrer par couleur
-var baseFilterControl = L.control({ position: 'topright' });
-
-baseFilterControl.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'base-filter-control');
-    div.innerHTML = '<h4>Filtrer par projet</h4>';
-
-    var selectHTML = '<select onchange="updateBaseFilter(this.value)">';
-    selectHTML += '<option value="">Tous les projets</option>';
-    for (var key in bases) {
-        selectHTML += '<option value="' + key + '">' + bases[key] + '</option>';
-    }
-    selectHTML += '</select>';
-
-    div.innerHTML += selectHTML;
-
-    return div;
-};
-
-baseFilterControl.addTo(map);
 
 
 ///////////////////////
