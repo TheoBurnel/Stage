@@ -561,54 +561,70 @@ colorFilterControl.addTo(map);
 ///////////////////////
 // FONCTION POUR RÉCUPÉRER LES DONNÉES
 function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, colorFilter, baseFilter) {
+    // Nettoie les anciens marqueurs de la carte
     markers.clearLayers();
 
+    // Utilisation d'un objet pour suivre les marqueurs parent déjà ajoutés
     var parentMarkers = {};
 
+    // Parcours de chaque entité (feature) dans les données géographiques (geojson)
     geojson_RAMA.features.forEach(function (feature) {
+        // Extraction de l'année à partir de la propriété 'Date_filtre' de l'entité
         var dateYear = parseInt(feature.properties.Date_filtre.split("-")[0]);
+        // Récupération des autres propriétés de l'entité
         var type = feature.properties.Type;
         var couleur = feature.properties.Couleur;
         var parent = feature.properties.Parent;
         var projet = feature.properties.Projet;
         var titre = feature.properties.Titre;
 
-        // Nettoyer la valeur du filtre de base en supprimant les apostrophes
+        // Nettoyer la valeur du filtre de base en mettant en minuscule et en supprimant les apostrophes
         var cleanedBaseFilter = baseFilter.toLowerCase().replace(/'/g, '');
 
-        // Filter based on date, material, color, and base
+        // Vérifier si l'entité est un parent en fonction de son identifiant
         if (isParent(feature.properties.Identifiant)) {
+            // Appliquer les filtres : année, matériau, couleur et filtre de base
             if (
                 dateYear <= yearFilter &&
                 (materiauFilter === '' || feature.properties.Materiaux.toLowerCase().includes(materiauFilter.toLowerCase())) &&
                 (colorFilter === '' || couleur.toLowerCase().includes(colorFilter.toLowerCase())) &&
                 (cleanedBaseFilter === '' || projet.toLowerCase().includes(cleanedBaseFilter))
             ) {
+                // Vérifier si le parent n'a pas encore été ajouté comme marqueur
                 if (!(parent in parentMarkers)) {
+                    // Récupérer les coordonnées de l'entité pour créer un marqueur Leaflet
                     var coordinates = feature.geometry.coordinates;
                     var marker = L.marker([coordinates[1], coordinates[0]]);
                     var identifiant = feature.properties.Identifiant;
+                    
+                    // Créer le contenu de la fenêtre contextuelle (popup) à afficher
                     var popupContent = createCarousel(parent, identifiant);
 
+                    // Créer et attacher une infobulle (tooltip) au marqueur
                     var tooltip = L.tooltip().setContent(titre);
-
                     marker.bindTooltip(tooltip);
 
+                    // Attacher le contenu de la fenêtre contextuelle (popup) au marqueur
                     marker.bindPopup(popupContent, {
                         maxWidth: 400
                     });
 
+                    // Cacher la barre latérale lorsque la fenêtre contextuelle se ferme
                     marker.on('popupclose', function () {
                         hideSlidebar();
                     });
 
+                    // Ajouter le marqueur à la couche de marqueurs (markers)
                     markers.addLayer(marker);
 
+                    // Marquer le parent comme ayant été ajouté
                     parentMarkers[parent] = true;
                 }
             }
         }
     });
 
+    // Ajouter la couche de marqueurs à la carte
     map.addLayer(markers);
 }
+
