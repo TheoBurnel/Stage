@@ -4,7 +4,7 @@ import os
 
 def extract_coordinates(coord_string):
     if not coord_string.strip():
-        return None
+        return [-8, 48]  # Retourner les coordonnées par défaut : longitude -8, latitude 48
     
     if '§' in coord_string:
         coord_pair = coord_string.split('§')[0]
@@ -60,9 +60,9 @@ def csv_to_json(input_csv_path, output_json_path):
             coord_string = row['schema:geographicArea']
             coordinates = extract_coordinates(coord_string)
 
-            # Ignorer les lignes sans coordonnées valides
+            # Si les coordonnées sont None (par exemple, champ vide), utiliser les coordonnées par défaut
             if coordinates is None:
-                continue
+                coordinates = [-8, 48]  # Coordonnées par défaut : longitude -8, latitude 48
             
             # Parse et échapper les valeurs de chaînes de caractères
             titre = escapeApostrophes(parse_value(row["dcterms:title"]))

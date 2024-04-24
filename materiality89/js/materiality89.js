@@ -41,7 +41,8 @@ function getChildrenByParent(parent) {
                 localisation: feature.properties.Localisation || '?',
                 cote: feature.properties.Cote || '?',
                 date_filtre: feature.properties.Date_filtre || '?',
-                projet: feature.properties.Projet
+                projet: feature.properties.Projet || '?',
+                coordinates: feature.geometry.coordinates || '?'
             });
         }
     });
@@ -59,7 +60,10 @@ function createCarousel(parent, identifiant) {
     children.forEach(function (child, index) {
         var displayStyle = index === 0 ? 'block' : 'none';
 
-        carouselContent += "<div class='slide' style='display: " + displayStyle + "; padding-left: 30px;'>"; // Ajouter un padding à gauche pour décaler le texte
+        carouselContent += "<div class='slide' style='display: " + displayStyle + "; padding-left: 30px;'>";
+        if (child.coordinates && child.coordinates.length === 2 && child.coordinates[0] === -8 && child.coordinates[1] === 48) {
+            carouselContent += "<p><h4><u>Lieu de création inconnu</u></h4></p>";
+        }
         carouselContent += "<h3>" + child.titre + "</h3>";
         carouselContent += "<p>Identifiant : " + child.name + "</p>";
         if (child.caracteristique && child.caracteristique !== '?') {
@@ -83,6 +87,7 @@ function createCarousel(parent, identifiant) {
     return carouselContent;
 }
 
+
 // Fonction pour afficher la slidebar avec les détails de l'élément sélectionné
 function showSlidebar(child) {
     var slidebar = document.createElement('div');
@@ -90,14 +95,23 @@ function showSlidebar(child) {
 
     // Création du contenu HTML de la slidebar en vérifiant les valeurs
     var slidebarContent = `
-        <div class="slidebar-content">
-            <button class="close-btn" onclick="hideSlidebar()">&raquo;</button>
-            <div class="slidebar-header">
-                <h2>${child.titre || '?'}</h2>
-            </div>
-            <div class="slidebar-body">
-                <p><b>Identification</b></p>
-                <p><u>Identifiant :</u> ${child.name || '?'}</p>`;
+    <div class="slidebar-content">
+        <button class="close-btn" onclick="hideSlidebar()">&raquo;</button>
+        <div class="slidebar-header">`;
+
+    // Vérifier les coordonnées et afficher le message approprié si les coordonnées correspondent à [-8, 48]
+    if (child.coordinates && Array.isArray(child.coordinates) && child.coordinates[0] === -8 && child.coordinates[1] === 48) {
+        slidebarContent += `
+        <h4><u>Lieu de création inconnu</u></h4>`;
+    }
+
+    // Ajouter le titre de l'enfant à la section de l'en-tête
+    slidebarContent += `
+        <h2>${child.titre || '?'}</h2>
+    </div>
+    <div class="slidebar-body">
+        <p><b>Identification</b></p>
+        <p><u>Identifiant :</u> ${child.name || '?'}</p>`;
 
     if (child.type && child.type !== '?') {
         slidebarContent += `<p><u>Type d'œuvre :</u> ${child.type}</p>`;
