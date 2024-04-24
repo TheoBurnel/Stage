@@ -55,38 +55,38 @@ function getChildrenByParent(parent) {
 // Fonction pour créer le contenu du carrousel pour les enfants
 function createCarousel(parent, identifiant) {
     var carouselContent = "<div class='carousel'><div class='carousel-content'>";
-
+  
     var children = getChildrenByParent(parent);
-    children.forEach(function (child, index) {
-        var displayStyle = index === 0 ? 'block' : 'none';
-
-        carouselContent += "<div class='slide' style='display: " + displayStyle + "; padding-left: 30px;'>";
-        if (child.coordinates && child.coordinates.length === 2 && child.coordinates[0] === -8 && child.coordinates[1] === 48) {
-            carouselContent += "<p><h4><u>Lieu de création inconnu</u></h4></p>";
-        }
-        carouselContent += "<h3>" + child.titre + "</h3>";
-        carouselContent += "<p>Identifiant : " + child.name + "</p>";
-        if (child.caracteristique && child.caracteristique !== '?') {
-            carouselContent += "<p><u>Caractéristique</u>: " + child.caracteristique + "</p>";
-        }
-        if (child.technique && child.technique !== '?') {
-            carouselContent += "<p><u>Technique(s)</u>: " + child.technique + "</p>";
-        }
-        if (child.couleur && child.couleur !== '?') {
-            carouselContent += "<p><u>Couleur(s)</u>: " + child.couleur + "</p>";
-        }
-        if (child.materiaux && child.materiaux !== '?') {
-            carouselContent += "<p><u>Matériau(x)</u>: " + child.materiaux + "</p>";
-        }
-        carouselContent += "<p class='slidebar-link' onclick='showSlidebar(" + JSON.stringify(child) + ")'>En savoir plus</p>";
-        carouselContent += "</div>";
+  children.forEach(function (child, index) {
+      var displayStyle = index === 0 ? 'block' : 'none';
+  
+      carouselContent += "<div class='slide' style='display: " + displayStyle + "; padding-left: 30px;'>";
+      if (child.coordinates && child.coordinates.length === 2 && child.coordinates[0] === -8 && child.coordinates[1] === 48) {
+        carouselContent += "<p><h4><u>Lieu de création inconnu</u></h4></p>";
+      }
+      carouselContent += "<h3>" + child.titre + "</h3>";
+      carouselContent += "<p>Identifiant : " + child.name + "</p>";
+      if (child.caracteristique && child.caracteristique !== '?') {
+        carouselContent += "<p><u>Caractéristique</u>: " + child.caracteristique + "</p>";
+      }
+      if (child.technique && child.technique !== '?') {
+        carouselContent += "<p><u>Technique(s)</u>: " + child.technique + "</p>";
+      }
+      if (child.couleur && child.couleur !== '?') {
+        carouselContent += "<p><u>Couleur(s)</u>: " + child.couleur + "</p>";
+      }
+      if (child.materiaux && child.materiaux !== '?') {
+        carouselContent += "<p><u>Matériau(x)</u>: " + child.materiaux + "</p>";
+      }
+      carouselContent += "<p class='slidebar-link' onclick='showSlidebar(" + JSON.stringify(child) + ")'>En savoir plus</p>";
+      carouselContent += "</div>";
     });
-
+  
     carouselContent += "</div><button class='carousel-prev' onclick='prevSlide(this)'>❮</button><button class='carousel-next' onclick='nextSlide(this)'>❯</button></div>";
-
+  
     return carouselContent;
-}
-
+  }
+  
 
 // Fonction pour afficher la slidebar avec les détails de l'élément sélectionné
 function showSlidebar(child) {
@@ -400,7 +400,6 @@ uniqueMaterials.forEach(function (material) {
     matériaux[material] = material; // Utiliser le matériau comme clé et valeur dans l'objet matériaux
 });
 
-
 // Texte constant pour afficher "tous les matériaux"
 var nettoyage = {
     '': 'Nettoyer le filtre'
@@ -453,7 +452,6 @@ controlSelect.onAdd = function (map) {
 
     // Ajouter l'élément pour "tous les matériaux" 
     div.innerHTML += '<p class="all-materials-item" onclick="selectMaterial(\'\')">' + nettoyage[''] + '</p>';
-
 
     return div;
 };
@@ -515,9 +513,9 @@ function clearMaterialFilter() {
 // Ajouter le contrôle de recherche à la carte
 controlSelect.addTo(map);
 
+
 ///////////////
 //COULEURS
-
 // Définition des couleurs possibles avec leurs clés et libellés
 var colors = {
     argenté: 'argenté',
@@ -574,9 +572,6 @@ function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, 
         var parent = feature.properties.Parent;
         var projet = feature.properties.Projet;
         var titre = feature.properties.Titre;
-
-        // Debugging: Log information for each feature
-        console.log("Feature:", feature.properties);
 
         // Nettoyer la valeur du filtre de base en supprimant les apostrophes
         var cleanedBaseFilter = baseFilter.toLowerCase().replace(/'/g, '');
