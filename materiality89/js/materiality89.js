@@ -154,7 +154,7 @@ function showSlidebar(child) {
     if (child.cote && child.cote !== '?') {
         slidebarContent += `<p><u>Cote / numéro :</u> ${child.cote}</p>`;
     }
-    if (child.cote && child.cote !== '?') {
+    if (child.projet && child.projet !== '?') {
         slidebarContent += `<p><u>Projet :</u> ${child.projet}</p>`;
     }
 
@@ -169,7 +169,6 @@ function showSlidebar(child) {
         slidebar.style.transform = 'translateX(0)';
     }, 100);
 }
-
 
 // Fonction pour masquer et supprimer la slidebar
 function hideSlidebar() {
@@ -490,10 +489,9 @@ colorFilterControl.addTo(map);
 
 ///////////////
 //BASES
-
 // Définition des bases
 var bases = {
-    'La fabrique de l&#39;art. Couleurs et matériaux de l&#39;enluminuree': 'Couleurs et matériaux de l\'enluminure',
+    'Couleurs et matériaux': 'Couleurs et matériaux de l\'enluminure',
     'La fabrique matérielle du visuel. Panneaux peints en Méditerranée XIIIe-XVIe siècles': 'Panneaux peints en Méditerranée XIIIe-XVIe siècles'
 };
 
