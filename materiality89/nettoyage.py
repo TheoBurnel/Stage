@@ -1,4 +1,6 @@
 import csv
+import pandas as pd
+import numpy as np
 
 def nettoyer_identifiant(identifiant):
     # Trouver la position du premier § dans l'identifiant
@@ -10,43 +12,94 @@ def nettoyer_identifiant(identifiant):
         # Retourner l'identifiant tel quel s'il n'y a pas de §
         return identifiant
 
-def nettoyer_fichier_entree_sortie(fichier_entree, fichier_sortie):
-    # Liste pour stocker les lignes modifiées
-    lignes_modifiees = []
+def processer_fichier_entree(fichier_entree):
+    # Charger les données en ne sélectionnant que les colonnes pertinentes
+    data = pd.read_csv(fichier_entree)
 
-    # Lecture du fichier CSV d'entrée et modification des identifiants
-    with open(fichier_entree, 'r', newline='') as csvfile_entree:
-        lecteur_csv = csv.DictReader(csvfile_entree)
-        colonnes = lecteur_csv.fieldnames
+    # Nettoyer les identifiants dans la colonne 'dcterms:identifier'
+    data['dcterms:identifier'] = data['dcterms:identifier'].apply(nettoyer_identifiant)
 
-        for ligne in lecteur_csv:
-            identifiant_original = ligne['dcterms:identifier']
-            identifiant_nettoye = nettoyer_identifiant(identifiant_original)
-        
-            # Modifier la valeur de l'identifiant dans la même colonne
-            ligne['dcterms:identifier'] = identifiant_nettoye
-        
-            # Ajouter la ligne modifiée à la liste
-            lignes_modifiees.append(ligne)
+    # Filtrage des lignes contenant des coordonnées multiples
+    filtered_data = data[data['schema:geographicArea'].fillna('').str.contains('§')]
 
-    # Écriture des lignes modifiées dans le fichier CSV de sortie
-    with open(fichier_sortie, 'w', newline='') as csvfile_sortie:
-        ecrivain_csv = csv.DictWriter(csvfile_sortie, fieldnames=colonnes)
-        ecrivain_csv.writeheader()
-        ecrivain_csv.writerows(lignes_modifiees)
+    # Création du DataFrame étendu avec des coordonnées séparées
+    extended_data = pd.DataFrame()
 
-    print(f"Modification terminée. Les identifiants ont été nettoyés dans le fichier de sortie : {fichier_sortie}")
+    for _, row in filtered_data.iterrows():
+        coords = row['schema:geographicArea'].split('§')
+        for coord in coords:
+            new_row = {col: row[col] for col in data.columns}  # Garder toutes les colonnes du document original
+            new_row['schema:geographicArea'] = coord.strip()
+            extended_data = pd.concat([extended_data, pd.DataFrame([new_row])], ignore_index=True)
 
-# Fichier d'entrée et de sortie pour materiality89.csv
-fichier_entree_89 = 'donnees/materiality89.csv'
-fichier_sortie_89 = 'donnees/materiality_net.csv'
+    # Suppression des doublons
+    extended_data.drop_duplicates(subset=['dcterms:identifier', 'schema:geographicArea'], inplace=True)
 
-# Nettoyage du fichier materiality89.csv
-nettoyer_fichier_entree_sortie(fichier_entree_89, fichier_sortie_89)
+    # Extraction des latitudes et longitudes
+    extended_data[['latitude', 'longitude']] = extended_data['schema:geographicArea'].str.split(',', expand=True)
 
-# Fichier d'entrée et de sortie pour materiality88.csv
-fichier_entree_88 = 'donnees/materiality88.csv'
-fichier_sortie_88 = 'donnees/materiality_net2.csv'
+    # Conversion en types numériques
+    extended_data['latitude'] = pd.to_numeric(extended_data['latitude'], errors='coerce')
+    extended_data['longitude'] = pd.to_numeric(extended_data['longitude'], errors='coerce')
 
-# Nettoyage du fichier materiality88.csv
-nettoyer_fichier_entree_sortie(fichier_entree_88, fichier_sortie_88)
+    # Grouper les données par 'dcterms:identifier' pour effectuer les comparaisons
+    grouped = extended_data.groupby('dcterms:identifier')
+
+    # Fonction pour déterminer quelle ligne conserver selon les critères spécifiés
+    def keep_most_precise(group):
+        if len(group) == 1:
+            return group  # Si une seule ligne, la conserver
+
+        # Calculer les différences entre les latitudes et les longitudes
+        lat_diffs = np.abs(group['latitude'].diff())
+        lon_diffs = np.abs(group['longitude'].diff())
+
+        # Préparer un masque pour garder la ligne la plus précise
+        keep_mask = np.ones(len(group), dtype=bool)
+
+        for i in range(1, len(group)):
+            if lat_diffs.iloc[i] <= 3 and lon_diffs.iloc[i] <= 3:
+                # Comparer les précisions des latitudes et longitudes
+                curr_lat_precision = len(str(group['latitude'].iloc[i]).split('.')[-1])
+                prev_lat_precision = len(str(group['latitude'].iloc[i-1]).split('.')[-1])
+                curr_lon_precision = len(str(group['longitude'].iloc[i]).split('.')[-1])
+                prev_lon_precision = len(str(group['longitude'].iloc[i-1]).split('.')[-1])
+
+                if (curr_lat_precision < prev_lat_precision) or (curr_lon_precision < prev_lon_precision):
+                    keep_mask[i] = False  # Supprimer la ligne actuelle si moins précise
+
+                if (curr_lat_precision == prev_lat_precision) or (curr_lon_precision == prev_lon_precision):
+                    keep_mask[i] = False  # Garder une ligne si même décimale
+
+        return group[keep_mask]
+
+    # Appliquer la fonction de filtrage et concaténer les résultats
+    filtered_data = grouped.apply(keep_most_precise).reset_index(drop=True)
+
+    # Identifier les lignes non retenues par le filtrage
+    not_kept_indices = filtered_data.index.isin(filtered_data['dcterms:identifier'].unique())
+
+    # Extraire les lignes non retenues du DataFrame original
+    not_kept_data = data[~data['schema:geographicArea'].fillna('').str.contains('§')]
+
+    # Combiner les DataFrames filtrés avec les lignes non retenues pour obtenir le résultat final
+    final_data = pd.concat([filtered_data, not_kept_data], ignore_index=True)
+
+    return final_data
+
+# Appeler la fonction pour traiter materiality89.csv
+df1 = processer_fichier_entree('donnees/materiality89.csv')
+
+# Appeler la fonction pour traiter materiality88.csv
+df2 = processer_fichier_entree('donnees/materiality88.csv')
+
+# Concaténer les DataFrames en un seul
+df_combined = pd.concat([df1, df2], ignore_index=True)
+
+# Chemin vers le fichier de sortie combiné (bases.csv)
+chemin_sortie = "donnees/bases.csv"
+
+# Enregistrer le DataFrame combiné dans un nouveau fichier CSV
+df_combined.to_csv(chemin_sortie, index=False)
+
+print("Les fichiers CSV ont été combinés avec succès.")
