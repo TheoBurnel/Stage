@@ -506,12 +506,21 @@ controlSelect.addTo(map);
 
 // Définition des couleurs possibles avec leurs clés et libellés
 var colors = {
+    argenté: 'argenté',
+    beige: 'beige',
     blanc: 'blanc',
+    bleu: 'bleu',
+    brun: 'brun',
+    cuivré: 'cuivré',
+    doré: 'doré',
+    gris: 'gris',
+    jaune: 'jaune',
     noir: 'noir',
+    orange: 'orange',
+    rose: 'rose',
     rouge: 'rouge',
     vert: 'vert',
-    bleu: 'bleu',
-    jaune: 'jaune'
+    violet: 'violet'
     // Ajoutez d'autres couleurs si nécessaire
 };
 
