@@ -99,23 +99,58 @@ function expandImage(img) {
     // Créer un overlay pour afficher l'image agrandie
     var overlay = document.createElement('div');
     overlay.className = 'image-overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '9999';
 
     // Créer l'élément de l'image agrandie
-    var enlargedImg = document.createElement('img');
+    var enlargedImg = new Image();
     enlargedImg.src = img.src;
     enlargedImg.className = 'enlarged-image';
+    enlargedImg.style.maxWidth = '80%';
+    enlargedImg.style.maxHeight = '80%';
+    enlargedImg.style.cursor = 'zoom-in'; // Utiliser le symbole de loupe "+" pour le zoom in
 
     // Ajouter l'image agrandie à l'overlay
     overlay.appendChild(enlargedImg);
 
-    // Ajouter l'overlay à la page
-    document.body.appendChild(overlay);
+    // Fonction pour gérer le zoom au clic
+    enlargedImg.onclick = function(e) {
+        e.stopPropagation(); // Arrêter la propagation du clic pour éviter la fermeture de l'overlay
 
-    // Ajouter un événement pour fermer l'image agrandie en cliquant dessus
+        if (enlargedImg.style.cursor === 'zoom-in') {
+            // Calculer les coordonnées du clic par rapport à l'image agrandie
+            var rect = enlargedImg.getBoundingClientRect();
+            var x = e.clientX - rect.left; // Position X du clic par rapport à l'image
+            var y = e.clientY - rect.top; // Position Y du clic par rapport à l'image
+
+            // Zoomer à l'endroit du clic
+            enlargedImg.style.cursor = 'zoom-out'; // Utiliser le symbole de loupe "-" pour le zoom out
+            enlargedImg.style.transformOrigin = `${x}px ${y}px`; // Définir l'origine du zoom
+            enlargedImg.style.transform = 'scale(4)'; // Facteur de zoom
+        } else {
+            // Annuler le zoom
+            enlargedImg.style.cursor = 'zoom-in'; // Revenir au symbole de loupe "+" pour le zoom in
+            enlargedImg.style.transform = 'scale(1)';
+        }
+    };
+
+    // Fermer l'image agrandie en cliquant à l'extérieur de l'image
     overlay.onclick = function() {
         document.body.removeChild(overlay);
     };
+
+    // Ajouter l'overlay à la page
+    document.body.appendChild(overlay);
 }
+
 
 // Fonction pour afficher la slidebar avec les détails de l'élément sélectionné
 function showSlidebar(child) {
