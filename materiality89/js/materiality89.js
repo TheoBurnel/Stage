@@ -376,7 +376,6 @@ function updateBaseFilter(value) {
     filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter, currentBaseFilter);
 }
 
-// Ajout du contrôle de sélection avec jauge pour filtrer par année de réalisation
 var controlSlider = L.control({ position: 'topright' });
 
 controlSlider.onAdd = function (map) {
@@ -386,14 +385,18 @@ controlSlider.onAdd = function (map) {
     // Bouton pour diminuer l'année
     var decreaseButton = L.DomUtil.create('button', 'year-decrease-btn');
     decreaseButton.innerHTML = '-';
-    decreaseButton.onclick = function () {
+    decreaseButton.onclick = function (e) {
+        e.preventDefault(); // Empêcher le comportement par défaut du bouton
+        e.stopPropagation(); // Arrêter la propagation du clic
         decrementYear();
     };
 
     // Bouton pour augmenter l'année
     var increaseButton = L.DomUtil.create('button', 'year-increase-btn');
     increaseButton.innerHTML = '+';
-    increaseButton.onclick = function () {
+    increaseButton.onclick = function (e) {
+        e.preventDefault(); // Empêcher le comportement par défaut du bouton
+        e.stopPropagation(); // Arrêter la propagation du clic
         incrementYear();
     };
 
@@ -404,7 +407,9 @@ controlSlider.onAdd = function (map) {
     yearRangeInput.max = yearFilterMax;
     yearRangeInput.value = currentYearFilter;
     yearRangeInput.step = 10; // Utilisation d'un pas de 10 pour l'année
-    yearRangeInput.onchange = function () {
+    yearRangeInput.oninput = function (e) {
+        e.preventDefault(); // Empêcher le comportement par défaut de la jauge
+        e.stopPropagation(); // Arrêter la propagation du changement
         updateYearFilter(this.value);
     };
 
@@ -439,7 +444,6 @@ function decrementYear() {
         updateYearFilter(currentYearFilter);
     }
 }
-
 
 ///////////////
 //MATERIAUX
