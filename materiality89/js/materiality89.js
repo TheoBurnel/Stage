@@ -283,7 +283,7 @@ baseFilterControl.addTo(map);
 // Variables pour les filtres par date
 var yearFilterMin = 400;
 var yearFilterMax = 1860;
-var currentYearFilter = yearFilterMin;
+var currentYearFilter = 1130;
 
 // Variables pour le filtre par materiau
 var currentMateriauFilter = '';
@@ -293,6 +293,8 @@ var currentColorFilter = '';
 
 // Variables pour le filtre par projet
 var currentBaseFilter = '';
+
+filterMarkersByDateTypeAndColorAndMateriau(currentYearFilter, currentMateriauFilter, currentColorFilter, currentBaseFilter);
 
 // Fonction pour mettre à jour le filtre par année de réalisation
 function updateYearFilter(value) {
