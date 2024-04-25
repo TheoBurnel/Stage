@@ -51,6 +51,7 @@ function getChildrenByParent(parent) {
     return children;
 }
 
+
 ///////////////////////
 // CARROUSEL ET SLIDEBAR
 // Fonction pour créer le contenu du carrousel pour les enfants
@@ -68,7 +69,7 @@ function createCarousel(parent, identifiant) {
         carouselContent += "<h3>" + child.titre + "</h3>";
 
         if (child.image && child.image !== '?' ) {
-            carouselContent += "<img src='" + child.image + "' />";
+            carouselContent += "<img id='carousel-image-" + index + "' src='" + child.image + "' onclick='expandImage(this)' />";
         }
         carouselContent += "<p class='carousel-legend'>Identifiant de la photo :<br>" + child.name + "</p>";
 
@@ -94,6 +95,48 @@ function createCarousel(parent, identifiant) {
     return carouselContent;
 }
 
+function expandImage(img) {
+    var overlay = document.createElement('div');
+    overlay.className = 'image-overlay';
+
+    var enlargedImg = document.createElement('img');
+    enlargedImg.src = img.src;
+    enlargedImg.className = 'enlarged-image';
+    overlay.appendChild(enlargedImg);
+
+    document.body.appendChild(overlay);
+
+    // Initialiser le niveau de zoom
+    var zoomLevel = 1.0;
+
+    // Gérer le zoom de l'image agrandie
+    function handleZoom(event) {
+        event.preventDefault(); // Empêche le défilement par défaut de la page
+    
+        var delta = event.deltaY || event.detail || (-event.wheelDelta);
+    
+        // Ajuster le niveau de zoom
+        zoomLevel += delta * 0.01; // Ajustez le facteur de zoom selon vos besoins
+    
+        // Limiter le niveau de zoom
+        zoomLevel = Math.max(0.5, Math.min(3.0, zoomLevel));
+    
+        // Appliquer le zoom à l'image agrandie
+        enlargedImg.style.transform = 'scale(' + zoomLevel + ')';
+    }    
+
+    // Ajouter un événement de défilement de la souris pour le zoom
+    overlay.addEventListener('mousewheel', handleZoom);
+    overlay.addEventListener('wheel', handleZoom);
+
+    // Ajouter un événement pour fermer l'image agrandie en cliquant dessus
+    overlay.onclick = function() {
+        document.body.removeChild(overlay);
+        // Supprimer les gestionnaires d'événements lorsque l'image est fermée
+        overlay.removeEventListener('mousewheel', handleZoom);
+        overlay.removeEventListener('wheel', handleZoom);
+    };
+}
 
 // Fonction pour afficher la slidebar avec les détails de l'élément sélectionné
 function showSlidebar(child) {
@@ -119,7 +162,6 @@ function showSlidebar(child) {
     <div class="slidebar-body">
         <p><b>Identification</b></p>
         <p><u>Identifiant :</u> ${child.name || '?'}</p>`;
-
 
     if (child.type && child.type !== '?') {
         slidebarContent += `<p><u>Type d'œuvre :</u> ${child.type}</p>`;
@@ -275,7 +317,6 @@ function updateBaseFilter(value) {
 
 // Ajouter le contrôle de sélection avec des boutons radio à la carte
 baseFilterControl.addTo(map);
-
 
 
 ///////////////
