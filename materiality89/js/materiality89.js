@@ -66,12 +66,12 @@ function createCarousel(parent, identifiant) {
             carouselContent += "<p><h4><u>Lieu de création inconnu</u></h4></p>";
         }
         carouselContent += "<h3>" + child.titre + "</h3>";
-        carouselContent += "<p>Identifiant : " + child.name + "</p>";
 
         if (child.image && child.image !== '?' ) {
             carouselContent += "<img src='" + child.image + "' />";
         }
-        
+        carouselContent += "<p class='carousel-legend'>Identifiant de la photo :<br>" + child.name + "</p>";
+
         if (child.caracteristique && child.caracteristique !== '?') {
             carouselContent += "<p><u>Caractéristique</u>: " + child.caracteristique + "</p>";
         }

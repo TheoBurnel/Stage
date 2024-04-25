@@ -148,6 +148,23 @@ button:hover {
   position: relative;
 }
 
+.carousel-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  max-height: 400px;
+  border: 2px solid #ccc;
+  border-radius: 4px; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+}
+
+.carousel-legend {
+  font-size: 10px;
+  text-align: center;
+  font-style: italic;
+}
+
 /* Style pour le contrôle de filtre par année */
 .year-filter-control {
   background-color: white;
