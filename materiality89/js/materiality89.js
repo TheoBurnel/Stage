@@ -96,45 +96,24 @@ function createCarousel(parent, identifiant) {
 }
 
 function expandImage(img) {
+    // Créer un overlay pour afficher l'image agrandie
     var overlay = document.createElement('div');
     overlay.className = 'image-overlay';
 
+    // Créer l'élément de l'image agrandie
     var enlargedImg = document.createElement('img');
     enlargedImg.src = img.src;
     enlargedImg.className = 'enlarged-image';
+
+    // Ajouter l'image agrandie à l'overlay
     overlay.appendChild(enlargedImg);
 
+    // Ajouter l'overlay à la page
     document.body.appendChild(overlay);
-
-    // Initialiser le niveau de zoom
-    var zoomLevel = 1.0;
-
-    // Gérer le zoom de l'image agrandie
-    function handleZoom(event) {
-        event.preventDefault(); // Empêche le défilement par défaut de la page
-    
-        var delta = event.deltaY || event.detail || (-event.wheelDelta);
-    
-        // Ajuster le niveau de zoom
-        zoomLevel += delta * 0.01; // Ajustez le facteur de zoom selon vos besoins
-    
-        // Limiter le niveau de zoom
-        zoomLevel = Math.max(0.5, Math.min(3.0, zoomLevel));
-    
-        // Appliquer le zoom à l'image agrandie
-        enlargedImg.style.transform = 'scale(' + zoomLevel + ')';
-    }    
-
-    // Ajouter un événement de défilement de la souris pour le zoom
-    overlay.addEventListener('mousewheel', handleZoom);
-    overlay.addEventListener('wheel', handleZoom);
 
     // Ajouter un événement pour fermer l'image agrandie en cliquant dessus
     overlay.onclick = function() {
         document.body.removeChild(overlay);
-        // Supprimer les gestionnaires d'événements lorsque l'image est fermée
-        overlay.removeEventListener('mousewheel', handleZoom);
-        overlay.removeEventListener('wheel', handleZoom);
     };
 }
 

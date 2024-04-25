@@ -153,7 +153,7 @@ button:hover {
   height: auto;
   display: block;
   margin: 0 auto;
-  max-height: 400px;
+  max-height: 350px;
   border: 2px solid #ccc;
   border-radius: 4px; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
