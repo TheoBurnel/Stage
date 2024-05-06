@@ -68,7 +68,7 @@ function createCarousel(parent, identifiant) {
         }
         carouselContent += "<h3>" + child.titre + "</h3>";
 
-        if (child.image && child.image !== '?' ) {
+        if (child.image && child.image !== '?') {
             carouselContent += "<img id='carousel-image-" + index + "' src='" + child.image + "' onclick='expandImage(this)' />";
         }
         carouselContent += "<p class='carousel-legend'>Identifiant de la photo :<br>" + child.name + "</p>";
@@ -76,7 +76,7 @@ function createCarousel(parent, identifiant) {
         if (child.caracteristique && child.caracteristique !== '?') {
             carouselContent += "<p><u>Caractéristique</u>: " + child.caracteristique + "</p>";
         }
-    
+
         if (child.technique && child.technique !== '?') {
             carouselContent += "<p><u>Technique(s)</u>: " + child.technique + "</p>";
         }
@@ -122,7 +122,7 @@ function expandImage(img) {
     overlay.appendChild(enlargedImg);
 
     // Fonction pour gérer le zoom au clic
-    enlargedImg.onclick = function(e) {
+    enlargedImg.onclick = function (e) {
         e.stopPropagation(); // Arrêter la propagation du clic pour éviter la fermeture de l'overlay
 
         if (enlargedImg.style.cursor === 'zoom-in') {
@@ -143,7 +143,7 @@ function expandImage(img) {
     };
 
     // Fermer l'image agrandie en cliquant à l'extérieur de l'image
-    overlay.onclick = function() {
+    overlay.onclick = function () {
         document.body.removeChild(overlay);
     };
 
@@ -386,8 +386,6 @@ controlSlider.onAdd = function (map) {
     var decreaseButton = L.DomUtil.create('button', 'year-decrease-btn');
     decreaseButton.innerHTML = '-';
     decreaseButton.onclick = function (e) {
-        e.preventDefault(); // Empêcher le comportement par défaut du bouton
-        e.stopPropagation(); // Arrêter la propagation du clic
         decrementYear();
     };
 
@@ -395,8 +393,6 @@ controlSlider.onAdd = function (map) {
     var increaseButton = L.DomUtil.create('button', 'year-increase-btn');
     increaseButton.innerHTML = '+';
     increaseButton.onclick = function (e) {
-        e.preventDefault(); // Empêcher le comportement par défaut du bouton
-        e.stopPropagation(); // Arrêter la propagation du clic
         incrementYear();
     };
 
@@ -408,8 +404,6 @@ controlSlider.onAdd = function (map) {
     yearRangeInput.value = currentYearFilter;
     yearRangeInput.step = 10; // Utilisation d'un pas de 10 pour l'année
     yearRangeInput.oninput = function (e) {
-        e.preventDefault(); // Empêcher le comportement par défaut de la jauge
-        e.stopPropagation(); // Arrêter la propagation du changement
         updateYearFilter(this.value);
     };
 
@@ -423,6 +417,22 @@ controlSlider.onAdd = function (map) {
     div.appendChild(yearRangeInput);
     div.appendChild(increaseButton);
     div.appendChild(selectedYearLabel);
+
+    L.DomEvent.on(yearRangeInput, 'mousedown', function () {
+        map.dragging.disable();
+    });
+
+    L.DomEvent.on(yearRangeInput, 'mouseup', function () {
+        map.dragging.enable();
+    });
+
+    L.DomEvent.on(increaseButton, 'dblclick', function (e) {
+        e.stopPropagation();
+    });
+
+    L.DomEvent.on(decreaseButton, 'dblclick', function (e) {
+        e.stopPropagation();
+    });
 
     return div;
 };
@@ -668,7 +678,7 @@ function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, 
 
                     // Créer le contenu de la fenêtre contextuelle (popup) à afficher
                     var popupContent = createCarousel(parent, identifiant);
-                    
+
                     // Créer et attacher une infobulle (tooltip) au marqueur
                     var tooltip = L.tooltip().setContent(titre);
                     marker.bindTooltip(tooltip);
@@ -682,7 +692,7 @@ function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, 
                     marker.on('popupclose', function () {
                         hideSlidebar();
                     });
-                    
+
                     // Ajouter le marqueur à la couche de marqueurs (markers)
                     markers.addLayer(marker);
 
