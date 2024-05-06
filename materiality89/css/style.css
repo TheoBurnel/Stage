@@ -104,11 +104,27 @@ button:hover {
   color: #343a40;
 }
 
-/* Styles pour le carrousel */
-.carousel {
-  position: relative;
-  width: 100%;
-  height: 100%;
+/* Styles pour le contenu du carrousel */
+.carousel-content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+
+.carousel-content img {
+  max-width: 100%; /* Garantit que les images ne dépassent pas la largeur du conteneur */
+  height: auto; /* Permet aux images de conserver leurs proportions */
+  display: block; /* Les images sont affichées comme des blocs pour ajuster automatiquement leur largeur */
+  margin: 0 auto; /* Centre les images horizontalement dans le conteneur */
+  border: 2px solid #ccc; /* Ajoute une bordure de 2 pixels solide avec une couleur grise */
+  border-radius: 4px; /* Ajoute un arrondi de 4 pixels aux coins de l'image */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ajoute une ombre légère pour donner de la profondeur à l'image */
+}
+
+.carousel-legend {
+  font-size: 10px;
+  text-align: center;
+  font-style: italic;
 }
 
 /* Styles pour les boutons de navigation du carrousel */
@@ -138,33 +154,6 @@ button:hover {
 .slide {
     padding-right: 40px; /* Espace à droite pour éviter les flèches */
 }
-
-/* Styles pour le contenu du carrousel */
-.carousel-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 0 20px;
-  position: relative;
-}
-
-.carousel-content img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-  max-height: 350px;
-  border: 2px solid #ccc;
-  border-radius: 4px; 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-}
-
-.carousel-legend {
-  font-size: 10px;
-  text-align: center;
-  font-style: italic;
-}
-
 
 /*Style pour l'agrandissement de l'image */
 .slide img {

@@ -73,6 +73,8 @@ function createCarousel(parent, identifiant) {
         }
         carouselContent += "<p class='carousel-legend'>Identifiant de la photo :<br>" + child.name + "</p>";
 
+        carouselContent += "<p><h4>Analyses :</h4></p>";
+
         if (child.caracteristique && child.caracteristique !== '?') {
             carouselContent += "<p><u>Caractéristique</u>: " + child.caracteristique + "</p>";
         }
@@ -639,6 +641,7 @@ colorFilterControl.addTo(map);
 
 ///////////////////////
 // FONCTION POUR RÉCUPÉRER LES DONNÉES
+// Fonction pour filtrer les marqueurs par année, matériau, couleur et filtre de base
 function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, colorFilter, baseFilter) {
     // Nettoie les anciens marqueurs de la carte
     markers.clearLayers();
@@ -685,7 +688,15 @@ function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, 
 
                     // Attacher le contenu de la fenêtre contextuelle (popup) au marqueur
                     marker.bindPopup(popupContent, {
-                        maxWidth: 400
+                        maxHeight: 400
+                    });
+
+                    marker.on('popupopen', function (e) {
+                        updatePopupMaxHeight(e.popup); // Mettre à jour la hauteur maximale de la fenêtre contextuelle lors de l'ouverture
+                    });
+
+                    marker.on('popupcontentupdate', function (e) {
+                        updatePopupMaxHeight(e.popup); // Mettre à jour la hauteur maximale de la fenêtre contextuelle lors de la mise à jour du contenu
                     });
 
                     // Cacher la barre latérale lorsque la fenêtre contextuelle se ferme
@@ -706,4 +717,3 @@ function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, 
     // Ajouter la couche de marqueurs à la carte
     map.addLayer(markers);
 }
-
