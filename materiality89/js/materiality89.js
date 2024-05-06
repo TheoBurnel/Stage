@@ -682,7 +682,7 @@ function filterMarkersByDateTypeAndColorAndMateriau(yearFilter, materiauFilter, 
                     marker.on('popupclose', function () {
                         hideSlidebar();
                     });
-
+                    
                     // Ajouter le marqueur à la couche de marqueurs (markers)
                     markers.addLayer(marker);
 
