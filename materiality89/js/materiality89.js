@@ -346,7 +346,7 @@ baseFilterControl.addTo(map);
 // Variables pour les filtres par date
 var yearFilterMin = 400;
 var yearFilterMax = 1860;
-var currentYearFilter = 1130;
+var currentYearFilter = 1860;
 
 // Variables pour le filtre par materiau
 var currentMateriauFilter = '';
