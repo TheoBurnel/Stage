@@ -103,6 +103,7 @@ def csv_to_json(input_csv_path, output_json_path):
             image = escapeApostrophes(parse_value(row["dcterms:image"]))
             type_description = escapeApostrophes(parse_value(row['crm:P2_has_type']))
             caracteristique = escapeApostrophes(parse_value(row["dcterms:type"]))
+            motif = escapeApostrophes(parse_value(row['dcterms:subject']))
             technique = escapeApostrophes(parse_value(row["schema:artMedium"]))
             couleur = escapeApostrophes(parse_value(row["schema:color"]))
             materiaux = escapeApostrophes(parse_value(row["schema:material"]))
@@ -133,6 +134,7 @@ def csv_to_json(input_csv_path, output_json_path):
                     "Image": image,
                     "Type_description": type_description,
                     "Caracteristique": caracteristique,
+                    "Motif": motif,
                     "Technique": technique,
                     "Couleur": couleur,
                     "Materiaux": materiaux,

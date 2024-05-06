@@ -30,6 +30,7 @@ function getChildrenByParent(parent) {
                 realisation: feature.properties.Realisation || '?',
                 type_description: feature.properties.Type_description || '?',
                 caracteristique: feature.properties.Caracteristique || '?',
+                motif: feature.properties.Motif || '?',
                 technologie: feature.properties.Technologie || '?',
                 technique: feature.properties.Technique || '?',
                 couleur: feature.properties.Couleur || '?',
@@ -78,7 +79,9 @@ function createCarousel(parent, identifiant) {
         if (child.caracteristique && child.caracteristique !== '?') {
             carouselContent += "<p><u>Caractéristique</u>: " + child.caracteristique + "</p>";
         }
-
+        if (child.motif && child.motif !== '?') {
+            carouselContent += "<p><u>Motif étudié</u>: " + child.motif + "</p>";
+        }
         if (child.technique && child.technique !== '?') {
             carouselContent += "<p><u>Technique(s)</u>: " + child.technique + "</p>";
         }
@@ -199,6 +202,9 @@ function showSlidebar(child) {
     }
     if (child.caracteristique && child.caracteristique !== '?') {
         slidebarContent += `<p><u>Caractéristique :</u> ${child.caracteristique}</p>`;
+    }
+    if (child.motif && child.motif !== '?') {
+        slidebarContent += `<p><u>Motif étudié :</u> ${child.motif}</p>`;
     }
     if (child.technologie && child.technologie !== '?') {
         slidebarContent += `<p><u>Technologie(s) :</u> ${child.technologie}</p>`;
